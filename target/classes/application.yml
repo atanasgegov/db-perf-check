@@ -1,0 +1,14 @@
+commons:
+  execution: {what: elasticsearch, mode: inserts}
+  input-data-file: src/main/resources/winemag-data_first150k.csv
+  batch-size: 5000
+
+elasticsearch:
+  host: localhost
+  port: 9200
+  protocol: http
+  socket-timeout: 10000
+  connection-timeout: 5000
+  end-point: { search: /wine/_search, insert: /wine/_bulk }
+  io-thread-count: 1
+    
