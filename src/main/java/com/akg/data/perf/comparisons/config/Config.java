@@ -13,6 +13,7 @@ public class Config {
 	private Execution execution;
 	private String inputDataFile;
 	private int batchSize;
+	private int executionTimeInMs;
 	
 	public enum ExecutionMode {
 

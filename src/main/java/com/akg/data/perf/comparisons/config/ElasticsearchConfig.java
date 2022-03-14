@@ -1,5 +1,7 @@
 package com.akg.data.perf.comparisons.config;
 
+import java.util.List;
+
 import org.apache.http.HttpHost;
 import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.elasticsearch.client.Node;
@@ -25,6 +27,7 @@ public class ElasticsearchConfig {
 	private int connectionTimeout;
 	private EndPoint endPoint;
 	private int ioThreadCount;
+	private List<Query> queries;
 
 	@Bean
 	public RestClient getEsRestClient() {
