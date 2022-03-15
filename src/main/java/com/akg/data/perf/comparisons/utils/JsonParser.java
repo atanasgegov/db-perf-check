@@ -2,7 +2,7 @@ package com.akg.data.perf.comparisons.utils;
 
 import java.util.List;
 
-import com.akg.data.perf.comparisons.WineMagDTO;
+import com.akg.data.perf.comparisons.dto.WineMagDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;

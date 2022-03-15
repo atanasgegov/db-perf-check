@@ -11,8 +11,8 @@ import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.akg.data.perf.comparisons.WineMagDTO;
 import com.akg.data.perf.comparisons.config.Config;
+import com.akg.data.perf.comparisons.dto.WineMagDTO;
 
 import io.netty.util.internal.StringUtil;
 import lombok.extern.slf4j.Slf4j;

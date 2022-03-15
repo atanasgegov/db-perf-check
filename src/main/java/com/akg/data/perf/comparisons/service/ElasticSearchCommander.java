@@ -19,11 +19,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.akg.data.perf.comparisons.WineMagDTO;
 import com.akg.data.perf.comparisons.config.Config;
 import com.akg.data.perf.comparisons.config.ElasticsearchConfig;
 import com.akg.data.perf.comparisons.config.Query;
+import com.akg.data.perf.comparisons.dto.WineMagDTO;
 import com.akg.data.perf.comparisons.utils.JsonParser;
+import com.akg.data.perf.comparisons.utils.QueryExecutionCounter;
 import com.akg.data.perf.comparisons.utils.QueryUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -47,29 +48,36 @@ public class ElasticSearchCommander {
 	public int search() {
 
 		Map<Integer, Query> queriesMap = calculatePercentageExecForQueries();
+		QueryExecutionCounter queryExecutionCounter = new QueryExecutionCounter( esConfig.getQueries() );
 		long start = System.currentTimeMillis();
 		long endTimeInMs = start + (config.getExecutionTimeInMs());
 
 		int executed = 0;
+		boolean isSuccessful = false;
 		while (System.currentTimeMillis() <= endTimeInMs) {
 			int index = ThreadLocalRandom.current().nextInt(0, 100);
 			Query query = queriesMap.get(index);
-			executed = executed + (search(query) ? 1 : 0);
+			isSuccessful = search(query);
+			if( isSuccessful ) {
+				executed = executed + 1;
+				queryExecutionCounter.increment(query);
+			}
 		}
 
 		log.info("The Elasticsearch predefined queries were executed {} times", executed);
+		log.info( "Query Execution Counter: {}", queryExecutionCounter.toString() );
 		return executed;
 	}
 
 	public boolean search(Query query) {
 
 		String endpoint = esConfig.getEndPoint().getSearch();
-		Request request = new Request( "GET", endpoint );   
+		Request request = new Request( "POST", endpoint );   
 		try {
 			String jsonEntity = QueryUtil.getQueryWithRandomChoosenParameter( query );
 			request.setJsonEntity(jsonEntity);
 			Response response = restClient.performRequest(request);
-			log.info( EntityUtils.toString(response.getEntity()) );
+			log.debug( EntityUtils.toString(response.getEntity()) );
 			return true;
 		} catch (IOException e) {
 			log.error( "Something wrong happened calling {}, error: {}", endpoint, e.getMessage() );

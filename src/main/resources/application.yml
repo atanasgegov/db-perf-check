@@ -90,7 +90,7 @@ elasticsearch:
                                    }
                          }
              }',
-       percentage: 55,
+       percentage: 25,
        params: [
                  {param1: Bulgaria, param2: 96},{param1: Bulgaria, param2: 97},{param1: Bulgaria, param2: 98},{param1: Bulgaria, param2: 99},{param1: Bulgaria, param2: 100},
                  {param1: Romania,  param2: 96},{param1: Romania, param2: 97},{param1: Romania, param2: 98},{param1: Romania, param2: 99},{param1: Romania, param2: 100},
@@ -108,4 +108,41 @@ elasticsearch:
                  {param1: Chile, param2: 96},{param1: Chile, param2: 97},{param1: Chile, param2: 98},{param1: Chile, param2: 99},{param1: Chile, param2: 100},
                  {param1: Serbia, param2: 96},{param1: Serbia, param2: 97},{param1: Serbia, param2: 98},{param1: Serbia, param2: 99},{param1: Serbia, param2: 100}
                ]
+      }
+    - {
+        name: queryAggregations,
+        data: '{
+	              "size": 0,
+                  "aggs": {
+	                        "min_price": { "min": { "field": "price" } },
+                            "max_price": { "max": { "field": "price" } },
+                            "avg_price": { "avg": { "field": "price" } },
+                            "rows_count": { "value_count": { "field": "country.keyword"} },
+                            "country_count": { "cardinality": { "field": "country.keyword" } }
+                          }
+               }',
+        percentage: 15,
+        params: []
+      }
+    - {
+        name: queryCountAndGroupBy,
+        data: '{ 
+                 "size": 0,
+                 "aggs": {
+                           "group1": {
+                                        "terms": {
+                                                  "field": "country.keyword"
+                                        },
+                                        "aggs": {
+                                                 "variety_count": { "cardinality": { "field": "variety.keyword" } }
+                                        }
+                                     }
+                         }
+               }',
+        percentage: 15,
+        params: [
+                 {param1: country, param2: points},{param1: country, param2: price},{param1: country, param2: variety},
+                 {param1: province, param2: points},{param1: province, param2: variety},{param1: variety, param2: country},
+                 {param1: variety, param2: price}
+                ]
       }

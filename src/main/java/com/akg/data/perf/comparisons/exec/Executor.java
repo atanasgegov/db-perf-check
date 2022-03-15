@@ -26,6 +26,7 @@ public class Executor {
 		long start = System.currentTimeMillis();
 		String what = config.getExecution().getWhat();
 		String mode = config.getExecution().getMode();
+		log.info( "Executing '{}' '{}' queries for {} ms ...", what, mode, config.getExecutionTimeInMs() );
 		if( what.equals( Config.Technology.ELASTICSEARCH.getValue() ) ) {
 			if( mode.equals( Config.ExecutionMode.SEARCH.getValue() ) ) {
 				elasticSearchCommander.search();
@@ -35,6 +36,7 @@ public class Executor {
 		}
 		long end = System.currentTimeMillis();
 		log.info("Elapsed Time in seconds: "+ (double)(end-start)/1000);
+		System.exit(0);
 	}
 }
 

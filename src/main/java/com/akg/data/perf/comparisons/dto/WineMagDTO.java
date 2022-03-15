@@ -1,4 +1,4 @@
-package com.akg.data.perf.comparisons;
+package com.akg.data.perf.comparisons.dto;
 
 import lombok.Data;
 
