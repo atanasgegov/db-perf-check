@@ -1,7 +1,6 @@
 package com.akg.data.perf.comparisons.service;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -154,15 +153,6 @@ public class ElasticsearchCommander extends AbstractCommander {
 		} catch (IOException e) {
 			log.error( ERROR_SOMETHING_WRONG_HAPPENED_CALLING, endpoint, e.getMessage() );
 			return null;
-		}
-	}
-	
-	private List<String> getIds(Response response) {
-		try {
-			return QueryUtil.getIdsFromESResponse( response.getEntity().getContent(), ID_PRFIX, ID_SUFFIX );
-		} catch (IOException e) {
-			log.error( ERROR_SOMETHING_WRONG_HAPPENED, e.getMessage() );
-			return new ArrayList<>(0);
 		}
 	}
 	
