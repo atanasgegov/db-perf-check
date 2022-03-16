@@ -1,5 +1,6 @@
-package com.akg.data.perf.comparisons.service;
+package com.akg.data.perf.comparisons.utils;
 
+import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -8,27 +9,20 @@ import java.util.List;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import com.akg.data.perf.comparisons.config.Config;
 import com.akg.data.perf.comparisons.dto.WineMagDTO;
 
 import io.netty.util.internal.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 
-@Service
 @Slf4j
 public class WineMagLoader {
 
-	@Autowired
-	private Config config;
-	
-	public List<WineMagDTO> load(int startIndex, int endIndex) throws IOException {
+	public static List<WineMagDTO> load(int startIndex, int endIndex, String inputDataFile ) throws IOException {
 		List<WineMagDTO> list = new ArrayList<>();
-		try( Reader in = new FileReader(config.getInputDataFile()) ) {
+		try( Reader in = new FileReader(inputDataFile) ) {
 			Iterable<CSVRecord> records = CSVFormat.RFC4180.parse(in);
-			
+
 			int counter = 0;
 			for (CSVRecord csvRecord : records) {
 				if( counter++ < startIndex ) {
@@ -56,5 +50,17 @@ public class WineMagLoader {
 		}
 		
 		return list;
+	}
+
+	public static int getNumberOfRows(String inputDataFile ) throws IOException {
+		
+		int counter = 0;
+		try(BufferedReader br = new BufferedReader(new FileReader(inputDataFile))) {  
+			while (br.readLine() != null) {
+				counter++;
+			}
+		}
+
+		return counter;
 	}
 }

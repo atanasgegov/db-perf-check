@@ -12,9 +12,10 @@ import lombok.NoArgsConstructor;
 public class Query implements Comparable<Query> {
 
 	private String name;
-	private String data;
+	private String exec;
 	private Integer percentage;
 	private QueryParams[] params;
+	private String additionalExec;
 
 	@Override
 	public int compareTo(Query o) {
@@ -26,6 +27,6 @@ public class Query implements Comparable<Query> {
 	}
 	
 	public String toFullString() {
-		return "name: "+name+", data: "+data+", percentage: "+percentage;
+		return "name: "+name+", query: "+exec+", percentage: "+percentage;
 	}
 }

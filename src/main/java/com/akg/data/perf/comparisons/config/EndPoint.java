@@ -7,4 +7,5 @@ public class EndPoint {
 	
 	private String search;
 	private String insert;
+	private String update;
 }

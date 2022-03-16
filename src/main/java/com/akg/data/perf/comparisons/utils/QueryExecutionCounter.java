@@ -22,13 +22,13 @@ public class QueryExecutionCounter {
 	@Override
 	public String toString() {
 		StringBuilder str = new StringBuilder();
-		str.append("QUERY,EXECUTIONS").append(System.lineSeparator());
+		str.append("QUERY,EXECUTIONS,EPS").append(System.lineSeparator());
 		int[] total= new int[1];
 		queryCounter.forEach((k,v)->{
-			str.append(k.getName()).append(",").append(v).append(System.lineSeparator());
+			str.append(k.getName()).append(",").append(v).append(",").append( (double)v/60 ).append(System.lineSeparator());
 			total[0] = total[0] + v;
 		});
-		str.append("TOTAL,").append(total[0]);
+		str.append("TOTAL,").append(total[0]).append(",").append((double)total[0]/60);
 		return str.toString();
 	}
 }

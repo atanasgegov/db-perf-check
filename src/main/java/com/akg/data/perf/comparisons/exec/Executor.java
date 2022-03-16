@@ -6,7 +6,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import com.akg.data.perf.comparisons.config.Config;
-import com.akg.data.perf.comparisons.service.ElasticSearchCommander;
+import com.akg.data.perf.comparisons.service.ElasticsearchCommander;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,7 +18,7 @@ public class Executor {
 	private Config config;
 	
 	@Autowired
-	private ElasticSearchCommander elasticSearchCommander;
+	private ElasticsearchCommander elasticsearchCommander;
 	
 	@EventListener(ApplicationReadyEvent.class)
 	public void exec() {
@@ -29,9 +29,11 @@ public class Executor {
 		log.info( "Executing '{}' '{}' queries for {} ms ...", what, mode, config.getExecutionTimeInMs() );
 		if( what.equals( Config.Technology.ELASTICSEARCH.getValue() ) ) {
 			if( mode.equals( Config.ExecutionMode.SEARCH.getValue() ) ) {
-				elasticSearchCommander.search();
+				elasticsearchCommander.search();
 			} else if( mode.equals( Config.ExecutionMode.INSERTS.getValue() ) ) {
-				elasticSearchCommander.insert();
+				elasticsearchCommander.insert();
+			} else if( mode.equals( Config.ExecutionMode.UPDATES.getValue() ) ) {
+				elasticsearchCommander.update();
 			}
 		}
 		long end = System.currentTimeMillis();

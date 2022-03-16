@@ -1,9 +1,14 @@
 commons:
-  # mode: inserts, search
-  execution: {what: elasticsearch, mode: search} 
+  # mode: inserts, search, updates
+  execution: {what: elasticsearch, mode: updates} 
   input-data-file: src/main/resources/winemag-data_first150k.csv
   batch-size: 5000
   execution-time-in-ms: 60000
+
+logging:
+  level:
+    root: INFO
+    com.akg: DEBUG
 
 elasticsearch:
   host: localhost
@@ -11,12 +16,13 @@ elasticsearch:
   protocol: http
   socket-timeout: 10000
   connection-timeout: 5000
-  end-point: { search: /wine/_search, insert: /wine/_bulk }
+  end-point: { search: /wine/_search, insert: /wine/_bulk, update: /wine/_update/ }
   io-thread-count: 1
-  queries:
+  search-queries:
     - {
        name: queryByCountry,
-       data: '{
+       exec: '{
+                "size": 100,
                 "query": {
                            "bool": {
                                      "must": [
@@ -36,7 +42,8 @@ elasticsearch:
       }
     - {
        name: queryByPoints,
-       data: '{
+       exec: '{
+                "size": 100,
                 "query": {
                            "bool": {
                                      "must": [
@@ -56,7 +63,8 @@ elasticsearch:
       }
     - {
        name: queryByPrice,
-       data: '{
+       exec: '{
+                "size": 100,
                 "query": {
                            "range" : {
                                        "price" : {
@@ -72,7 +80,8 @@ elasticsearch:
       }
     - {
        name: queryByCountryAndPoints,
-       data: '{
+       exec: '{
+                "size": 100,
                 "query": {
                            "bool": {
                                      "must": [
@@ -111,38 +120,190 @@ elasticsearch:
       }
     - {
         name: queryAggregations,
-        data: '{
-	              "size": 0,
+        exec: '{
+                  "size": 0,
                   "aggs": {
-	                        "min_price": { "min": { "field": "price" } },
+                            "min_price": { "min": { "field": "price" } },
                             "max_price": { "max": { "field": "price" } },
                             "avg_price": { "avg": { "field": "price" } },
                             "rows_count": { "value_count": { "field": "country.keyword"} },
                             "country_count": { "cardinality": { "field": "country.keyword" } }
                           }
                }',
-        percentage: 15,
-        params: []
+       percentage: 15,
+       params: []
       }
     - {
         name: queryCountAndGroupBy,
-        data: '{ 
-                 "size": 0,
-                 "aggs": {
+        exec: '{
+                  "size": 0,
+                  "aggs": {
                            "group1": {
                                         "terms": {
-                                                  "field": "country.keyword"
+                                                  "field": "country.keyword",
+                                                  "size": 100
                                         },
                                         "aggs": {
                                                  "variety_count": { "cardinality": { "field": "variety.keyword" } }
                                         }
                                      }
-                         }
+                          }
                }',
-        percentage: 15,
-        params: [
+       percentage: 15,
+       params: [
                  {param1: country, param2: points},{param1: country, param2: price},{param1: country, param2: variety},
                  {param1: province, param2: points},{param1: province, param2: variety},{param1: variety, param2: country},
                  {param1: variety, param2: price}
                 ]
+      }
+  update-queries:
+    - {
+        name: updatePointsByCountry,
+        exec: '{
+                 "script" : {
+                 "source": "ctx._source.points = params.points",
+                 "lang": "painless",
+                 "params" : {
+                              "points" : 96
+                            }
+                 }
+        }',
+        percentage: 40,
+        params: [
+                  {param1: Bulgaria},{param1: Romania},{param1: Greece},{param1: Macedonia},{param1: Turkey},{param1: Germany},{param1: France},{param1: Italy},{param1: Austria},{param1: Spain},{param1: Portugal},{param1: Argentina}
+                ],
+        additional-exec: '{
+                "size": 100,
+                "query": {
+                           "bool": {
+                                     "must": [
+                                               {
+                                                 "match": {
+                                                            "country": "?1"
+                                                          }
+                                               }
+                                            ]
+                                   }
+                         }
+              }'
+      }
+    - {
+        name: updatePricesByCountry,
+        exec: '{
+                "script" : {
+                "source": "ctx._source.price = params.price",
+                "lang": "painless",
+                "params" : {
+                  "price" : 96
+                  }
+                }
+        }',
+        percentage: 15,
+        params: [
+                  {param1: Bulgaria},{param1: Romania},{param1: Greece},{param1: Macedonia},{param1: Turkey},{param1: Germany},{param1: France},{param1: Italy},{param1: Austria},{param1: Spain},{param1: Portugal},{param1: Argentina}
+                ],
+        additional-exec: '{
+                "size": 100,
+                "query": {
+                           "bool": {
+                                     "must": [
+                                               {
+                                                 "match": {
+                                                            "country": "?1"
+                                                          }
+                                               }
+                                            ]
+                                   }
+                         }
+              }'
+      }
+    - {
+        name: updatePointsByVariety,
+        exec: '{
+                "script" : {
+                "source": "ctx._source.points = params.points",
+                "lang": "painless",
+                "params" : {
+                  "points" : 96
+                }
+              }
+        }',
+        percentage: 15,
+        params: [
+                  {param1: Mavrud},{param1: Ruen},{param1: Cabernet Sauvignon},{param1: Red Blend},{param1: Bordeaux-style Red Blend},{param1: Sauvignon Blanc},{param1: Syrah},{param1: Riesling},{param1: Merlot},{param1: Zinfandel}
+                ],
+        additional-exec: '{
+                "size": 100,
+                "query": {
+                           "bool": {
+                                     "must": [
+                                               {
+                                                 "match": {
+                                                            "variety": "?1"
+                                                          }
+                                               }
+                                            ]
+                                   }
+                         }
+              }' 
+      }
+    - {
+        name: updatePricesByVariety,
+        exec: '{
+                "script" : {
+                "source": "ctx._source.price = params.price",
+                "lang": "painless",
+                "params" : {
+                  "price" : 96
+                }
+              }
+        }',
+        percentage: 15,
+        params: [
+                  {param1: Mavrud},{param1: Ruen},{param1: Cabernet Sauvignon},{param1: Red Blend},{param1: Bordeaux-style Red Blend},{param1: Sauvignon Blanc},{param1: Syrah},{param1: Riesling},{param1: Merlot},{param1: Zinfandel}
+                ],
+        additional-exec: '{
+                "size": 100,
+                "query": {
+                           "bool": {
+                                     "must": [
+                                               {
+                                                 "match": {
+                                                            "variety": "?1"
+                                                          }
+                                               }
+                                            ]
+                                   }
+                         }
+              }'
+      }  
+    - {
+        name: updatePricesByProvince ,
+        exec: '{
+                "script" : {
+                "source": "ctx._source.price = params.price",
+                "lang": "painless",
+                "params" : {
+                  "price" : 96
+                }
+              }
+        }',
+        percentage: 15,
+        params: [
+                  {param1: Thracian Valley},{param1: Washington},{param1: Tuscany},{param1: Bordeaux},{param1: Northern Spain},{param1: Mendoza Province},{param1: Burgundy},{param1: Piedmont},{param1: Veneto}
+                ],
+        additional-exec: '{
+                "size": 100,
+                "query": {
+                           "bool": {
+                                     "must": [
+                                               {
+                                                 "match": {
+                                                            "province": "?1"
+                                                          }
+                                               }
+                                            ]
+                                   }
+                         }
+              }'
       }

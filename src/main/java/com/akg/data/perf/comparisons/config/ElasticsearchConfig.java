@@ -27,7 +27,8 @@ public class ElasticsearchConfig {
 	private int connectionTimeout;
 	private EndPoint endPoint;
 	private int ioThreadCount;
-	private List<Query> queries;
+	private List<Query> searchQueries;
+	private List<Query> updateQueries;
 
 	@Bean
 	public RestClient getEsRestClient() {
