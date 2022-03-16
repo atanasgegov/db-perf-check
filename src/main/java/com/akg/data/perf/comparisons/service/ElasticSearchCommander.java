@@ -46,10 +46,10 @@ public class ElasticsearchCommander extends AbstractCommander {
 	
 	public int search() {
 
-		Map<Integer, Query> queriesMap = QueryUtil.calculatePercentageExecForQueries( esConfig.getSearchQueries() );
-		QueryExecutionCounter queryExecutionCounter = new QueryExecutionCounter( esConfig.getSearchQueries() );
 		long start = System.currentTimeMillis();
 		long endTimeInMs = start + (config.getExecutionTimeInMs());
+		Map<Integer, Query> queriesMap = QueryUtil.calculatePercentageExecForQueries( esConfig.getSearchQueries() );
+		QueryExecutionCounter queryExecutionCounter = new QueryExecutionCounter( start, esConfig.getSearchQueries() );
 
 		int executed = 0;
 		while (System.currentTimeMillis() <= endTimeInMs) {
@@ -98,9 +98,9 @@ public class ElasticsearchCommander extends AbstractCommander {
 	
 	public int update() {
 		Map<Integer, Query> queriesMap = QueryUtil.calculatePercentageExecForQueries( esConfig.getUpdateQueries() );
-		QueryExecutionCounter queryExecutionCounter = new QueryExecutionCounter( esConfig.getUpdateQueries() );
 		long start = System.currentTimeMillis();
 		long endTimeInMs = start + (config.getExecutionTimeInMs());
+		QueryExecutionCounter queryExecutionCounter = new QueryExecutionCounter( start, esConfig.getUpdateQueries() );
 
 		int executed = 0;
 		while (System.currentTimeMillis() <= endTimeInMs) {
@@ -120,6 +120,29 @@ public class ElasticsearchCommander extends AbstractCommander {
 				} catch (UnsupportedOperationException | IOException e) {
 					log.error( ERROR_SOMETHING_WRONG_HAPPENED, e.getMessage() );
 				}
+			}
+		}
+
+		this.printResult(executed, queryExecutionCounter);
+		return executed;
+	}
+	
+	public int delete() {
+		long start = System.currentTimeMillis();
+		long endTimeInMs = start + (config.getExecutionTimeInMs());
+		QueryExecutionCounter queryExecutionCounter = new QueryExecutionCounter( start, esConfig.getDeleteQueries() );
+
+		int executed = 0;
+		List<Query> deleteQueries = esConfig.getDeleteQueries();
+		for (Query query : deleteQueries) {
+			Response response = doRequest(esConfig.getEndPoint().getDelete(), query.getExec(), query.getParams());
+			if( response != null && response.getStatusLine().getStatusCode() < 300 ) {
+				executed = executed + 1;
+				queryExecutionCounter.increment(query);
+			}
+
+			if (System.currentTimeMillis() > endTimeInMs) {
+				break;
 			}
 		}
 

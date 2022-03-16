@@ -34,7 +34,13 @@ public class Executor {
 				elasticsearchCommander.insert();
 			} else if( mode.equals( Config.ExecutionMode.UPDATES.getValue() ) ) {
 				elasticsearchCommander.update();
+			} else if( mode.equals( Config.ExecutionMode.DELETES.getValue() ) ) {
+				elasticsearchCommander.delete();
+			} else {
+				log.warn("Wrong execution.mode value: '{}' for execution.what='{}' in the configuration file.", mode, what);
 			}
+		} else {
+			log.warn("Wrong execution.what value: '{}' in the configuration file.", what);
 		}
 		long end = System.currentTimeMillis();
 		log.info("Elapsed Time in seconds: "+ (double)(end-start)/1000);

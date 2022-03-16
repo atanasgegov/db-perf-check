@@ -29,6 +29,7 @@ public class ElasticsearchConfig {
 	private int ioThreadCount;
 	private List<Query> searchQueries;
 	private List<Query> updateQueries;
+	private List<Query> deleteQueries;
 
 	@Bean
 	public RestClient getEsRestClient() {

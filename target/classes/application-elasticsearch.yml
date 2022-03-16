@@ -4,7 +4,7 @@ elasticsearch:
   protocol: http
   socket-timeout: 10000
   connection-timeout: 5000
-  end-point: { search: /wine/_search, insert: /wine/_bulk, update: /wine/_update/ }
+  end-point: { search: /wine/_search, insert: /wine/_bulk, update: /wine/_update/, delete: /wine/_delete_by_query }
   io-thread-count: 1
   search-queries:
     - {
@@ -294,4 +294,62 @@ elasticsearch:
                                    }
                          }
               }'
+      }
+  delete-queries:
+    - {
+       name: queryByCountry,
+       exec: '{
+                "query": {
+                           "bool": {
+                                     "must": [
+                                               {
+                                                 "match": {
+                                                            "country": "?1"
+                                                          }
+                                               }
+                                            ]
+                                   }
+                         }
+              }',
+       params: [
+                 {param1: Brazil},{param1: Albania},{param1: Serbia}
+               ]
+      }
+    - {
+       name: queryByPoints,
+       exec: '{
+                "query": {
+                           "bool": {
+                                     "must": [
+                                               {
+                                                  "match": {
+                                                             "points": "?1"
+                                                           }
+                                               }
+                                            ]
+                                   }
+                         }
+              }',
+       params: [
+                 {param1: 91},{param1: 92},{param1: 93}
+               ]
+      }
+    - {
+       name: queryByPrice,
+       exec: '{
+                "query": {
+                           "bool": {
+                                     "must": [
+                                               {
+                                                  "match": {
+                                                             "price": "?1"
+                                                           }
+                                               }
+                                            ]
+                                   }
+                         }
+              }',
+       params: [
+                 {param1: 131},{param1: 132},{param1: 133}
+               ]
       }

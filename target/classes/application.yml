@@ -3,8 +3,8 @@ spring:
     include: elasticsearch
 
 commons:
-  # mode: inserts, search, updates
-  execution: {what: elasticsearch, mode: updates} 
+  # mode: inserts, search, updates, deletes
+  execution: {what: elasticsearch, mode: deletes} 
   input-data-file: src/main/resources/winemag-data_first150k.csv
   batch-size: 5000
   execution-time-in-ms: 60000
