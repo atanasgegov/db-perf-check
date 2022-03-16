@@ -46,7 +46,7 @@ public class WineMagLoader {
 				wmDTO.setWinery(csvRecord.get(10));
 				list.add(wmDTO);
 			}
-			log.info( "The current CSV file offset is {}", counter );
+			log.debug( "The current CSV file offset is {}", counter );
 		}
 		
 		return list;

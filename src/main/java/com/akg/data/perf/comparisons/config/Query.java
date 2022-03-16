@@ -17,6 +17,10 @@ public class Query implements Comparable<Query> {
 	private QueryParams[] params;
 	private String additionalExec;
 
+	public Query(String name) {
+		this.name = name;
+	}
+	
 	@Override
 	public int compareTo(Query o) {
 		return Integer.compare(this.percentage, o.percentage);

@@ -26,16 +26,16 @@ public class Executor {
 		long start = System.currentTimeMillis();
 		String what = config.getExecution().getWhat();
 		String mode = config.getExecution().getMode();
-		log.info( "Executing '{}' '{}' queries for {} ms ...", what, mode, config.getExecutionTimeInMs() );
+		log.info( "Executing '{}' '{}' queries for {} ms ...", what, mode, config.getExecution().getTimeInMs() );
 		if( what.equals( Config.Technology.ELASTICSEARCH.getValue() ) ) {
 			if( mode.equals( Config.ExecutionMode.SEARCH.getValue() ) ) {
-				elasticsearchCommander.search();
+				elasticsearchCommander.search(config.getExecution());
 			} else if( mode.equals( Config.ExecutionMode.INSERTS.getValue() ) ) {
-				elasticsearchCommander.insert();
+				elasticsearchCommander.insert(config.getExecution());
 			} else if( mode.equals( Config.ExecutionMode.UPDATES.getValue() ) ) {
-				elasticsearchCommander.update();
+				elasticsearchCommander.update(config.getExecution());
 			} else if( mode.equals( Config.ExecutionMode.DELETES.getValue() ) ) {
-				elasticsearchCommander.delete();
+				elasticsearchCommander.delete(config.getExecution());
 			} else {
 				log.warn("Wrong execution.mode value: '{}' for execution.what='{}' in the configuration file.", mode, what);
 			}
