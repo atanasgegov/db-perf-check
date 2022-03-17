@@ -36,7 +36,6 @@ public class ElasticsearchCommander extends AbstractCommander {
 	private static final String ID_SUFFIX = "\",";
 	private static final String ERROR_MSG_SOMETHING_WRONG_HAPPENED = "Something wrong happened error: {}";
 	private static final String ERROR_MSG_SOMETHING_WRONG_HAPPENED_CALLING = "Something wrong happened calling {}, error: {}";
-	private static final String INFO_MSG_COMPLETED_SUCCESSFULLY = "\n'{}' '{}' completed successfully.";
 
 	@Autowired
 	private RestClient restClient;
@@ -66,8 +65,8 @@ public class ElasticsearchCommander extends AbstractCommander {
 			}
 		}
 
-		log.info(INFO_MSG_COMPLETED_SUCCESSFULLY, execution.getWhat(), execution.getMode());
 		this.printResult(execution, queryExecutionCounter);
+		queryExecutionCounter.shutdownReccurentPrint();
 		return executed;
 	}
 
@@ -97,7 +96,7 @@ public class ElasticsearchCommander extends AbstractCommander {
 				} catch (IOException e) {
 					log.error(ERROR_MSG_SOMETHING_WRONG_HAPPENED, e.getMessage());
 				}
-				if (CollectionUtils.isEmpty(data)) {
+				if (CollectionUtils.isEmpty(data) || System.currentTimeMillis() > endTimeInMs) {
 					break;
 				}
 				String json = JsonParser.convert(data);
@@ -106,15 +105,11 @@ public class ElasticsearchCommander extends AbstractCommander {
 				queryExecutionCounter.increment(insertQuery, (batchSizeEnd-batchSizeStart));
 				batchSizeStart = batchSizeEnd + 1;
 				batchSizeEnd = ( batchSizeEnd + batchSize ) > sizeOfRecordsForInsert ? sizeOfRecordsForInsert : ( batchSizeEnd + batchSize );
-				
-				if(System.currentTimeMillis() > endTimeInMs) {
-					break;
-				}
 			}
 		}
 
-		log.info(INFO_MSG_COMPLETED_SUCCESSFULLY, execution.getWhat(), execution.getMode());
 		this.printResult(execution, queryExecutionCounter);
+		queryExecutionCounter.shutdownReccurentPrint();
 		return executed;
 	}
 
@@ -148,8 +143,8 @@ public class ElasticsearchCommander extends AbstractCommander {
 			}
 		}
 
-		log.info(INFO_MSG_COMPLETED_SUCCESSFULLY, execution.getWhat(), execution.getMode());
 		this.printResult(execution, queryExecutionCounter);
+		queryExecutionCounter.shutdownReccurentPrint();
 		return executed;
 	}
 
@@ -174,8 +169,8 @@ public class ElasticsearchCommander extends AbstractCommander {
 			}
 		}
 
-		log.info(INFO_MSG_COMPLETED_SUCCESSFULLY, execution.getWhat(), execution.getMode());
 		this.printResult(execution, queryExecutionCounter);
+		queryExecutionCounter.shutdownReccurentPrint();
 		return executed;
 	}
 
@@ -213,7 +208,8 @@ public class ElasticsearchCommander extends AbstractCommander {
 
 	private void printResult(Execution execution, QueryExecutionCounter queryExecutionCounter) {
 
-		log.info( execution.toString() );
-		log.info("Query Execution Counter:\n{}", queryExecutionCounter.toString());
+		String doneMessage = "Done" + System.lineSeparator() + execution.toString();
+		String queryExecutionCounterMessage = System.lineSeparator() + queryExecutionCounter.toString();
+		log.info( doneMessage + queryExecutionCounterMessage  );
 	}
 }

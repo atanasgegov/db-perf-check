@@ -18,13 +18,17 @@ public class QueryExecutionCounter {
 
 	private Long startTimeMillis;
 	private Map<Query,Integer> queryCounter = new HashMap<>();
+	private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 	
 	@Async
 	public void printReccurently(long frequencyOutputInSec) {
 		// Starting a recurrent thread
-		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 		Runnable threadPrintTask = () -> log.info(System.lineSeparator() + this.toString());
 		scheduler.scheduleAtFixedRate(threadPrintTask, 0, frequencyOutputInSec, TimeUnit.MILLISECONDS);
+	}
+	
+	public void shutdownReccurentPrint() {
+		scheduler.shutdown();
 	}
 
 	public QueryExecutionCounter(long startTimeMillis, List<Query> queries) {

@@ -10,10 +10,11 @@ import lombok.Data;
 @Data
 public class Config {
 
-	private Execution execution;
 	private String inputDataFile;
 	private int batchSize;
 	private long frequencyOutputInMs;
+	private UseCases useCases;
+	private String activeUseCase = UseCase.ONE.getValue();
 	
 	public enum ExecutionMode {
 
@@ -46,4 +47,18 @@ public class Config {
 		}
 	}
 
+	public enum UseCase {
+
+		ONE("one"),
+	    CRUD("crud"); 
+
+		private final String name;
+	    private UseCase(String name) {
+	        this.name = name;
+	    }
+
+	    public String getValue() {
+			return name;
+		}
+	}
 }

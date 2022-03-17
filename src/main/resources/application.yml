@@ -2,22 +2,23 @@ spring:
   profiles:
     include: elasticsearch
 
-commons:
-  # what: elasticsearch
-  # mode: inserts, search, updates, deletes
-  execution: {what: elasticsearch, mode: inserts, time-in-ms: 60000} 
-  input-data-file: src/main/resources/winemag-data_first150k.csv
-  batch-size: 5000
-  frequency-output-in-ms: 10000
-
 logging:
   level:
     root: INFO
     com.akg: INFO
 
-test-case:
-  operations:
-    - execution: {what: elasticsearch, mode: inserts, time-in-ms: 60000} 
-    - execution: {what: elasticsearch, mode: search, time-in-ms: 60000} 
-    - execution: {what: elasticsearch, mode: updates, time-in-ms: 60000}
-    - execution: {what: elasticsearch, mode: deletes, time-in-ms: 60000}
+commons:
+  input-data-file: src/main/resources/winemag-data_first150k.csv
+  batch-size: 5000
+  frequency-output-in-ms: 10000
+  active-use-case: crud # possible values are one, crud
+  use-cases:
+    # Execution type possible values:
+    #   what: elasticsearch
+    #   mode: inserts, search, updates, deletes
+    one: {what: elasticsearch, mode: inserts, time-in-ms: 60000} 
+    crud:
+      - {what: elasticsearch, mode: inserts, time-in-ms: 60000} 
+      - {what: elasticsearch, mode: search, time-in-ms: 60000} 
+      - {what: elasticsearch, mode: updates, time-in-ms: 60000}
+      - {what: elasticsearch, mode: deletes, time-in-ms: 60000}
