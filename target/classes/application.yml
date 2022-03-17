@@ -16,9 +16,9 @@ commons:
     # Execution type possible values:
     #   what: elasticsearch
     #   mode: inserts, search, updates, deletes
-    one: {what: elasticsearch, mode: inserts, time-in-ms: 60000} 
+    one: {what: elasticsearch, mode: search, time-in-ms: 60000} 
     crud:
-      - {what: elasticsearch, mode: inserts, time-in-ms: 60000} 
-      - {what: elasticsearch, mode: search, time-in-ms: 60000} 
+      - {what: elasticsearch, mode: inserts, time-in-ms: 1800000} 
+      - {what: elasticsearch, mode: search, time-in-ms: 300000} 
       - {what: elasticsearch, mode: updates, time-in-ms: 60000}
       - {what: elasticsearch, mode: deletes, time-in-ms: 60000}
