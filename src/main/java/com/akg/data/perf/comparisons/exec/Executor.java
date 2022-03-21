@@ -32,7 +32,7 @@ public class Executor {
 	private ElasticsearchCommander elasticsearchCommander;
 	@Autowired
 	private MongodbCommander mongodbCommander;
-	
+
 	@EventListener(ApplicationReadyEvent.class)
 	@Order(1)
 	public void exec() {

@@ -1,0 +1,17 @@
+# docker commands
+
+# elasticsearch
+open powershell
+wsl -d docker-desktop
+sysctl -w vm.max_map_count=262144
+
+# mongodb
+mongo -u root -p example
+use wine;
+db.createUser({user:"test",pwd:"test",roles:["readWrite","dbAdmin"]});
+db.createCollection('wines');
+show collections;
+db.wines.createIndex( {country : 1} );
+db.wines.createIndex( {points : 1} );
+db.wines.createIndex( {price : 1} );
+db.wines.createIndex( {country : 1, points: 1} );
