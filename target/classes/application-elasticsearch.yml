@@ -8,7 +8,7 @@ elasticsearch:
   io-thread-count: 1
   search-queries:
     - {
-       name: queryByCountry,
+       name: findByCountry,
        exec: '{
                 "size": 100,
                 "query": {
@@ -29,7 +29,7 @@ elasticsearch:
                ]
       }
     - {
-       name: queryByPoints,
+       name: findByPoints,
        exec: '{
                 "size": 100,
                 "query": {
@@ -50,7 +50,7 @@ elasticsearch:
                ]
       }
     - {
-       name: queryByPrice,
+       name: findByPrice,
        exec: '{
                 "size": 100,
                 "query": {
@@ -67,7 +67,7 @@ elasticsearch:
                ]
       }
     - {
-       name: queryByCountryAndPoints,
+       name: findByCountryAndPoints,
        exec: '{
                 "size": 100,
                 "query": {
@@ -107,22 +107,21 @@ elasticsearch:
                ]
       }
     - {
-        name: queryAggregations,
+        name: findAggregations,
         exec: '{
                   "size": 0,
                   "aggs": {
                             "min_price": { "min": { "field": "price" } },
                             "max_price": { "max": { "field": "price" } },
                             "avg_price": { "avg": { "field": "price" } },
-                            "rows_count": { "value_count": { "field": "country.keyword"} },
-                            "country_count": { "cardinality": { "field": "country.keyword" } }
+                            "rows_count": { "value_count": { "field": "country.keyword"} } 
                           }
                }',
        percentage: 15,
        params: []
       }
     - {
-        name: queryCountAndGroupBy,
+        name: findCountAndGroupByCountry,
         exec: '{
                   "size": 0,
                   "aggs": {
@@ -138,11 +137,7 @@ elasticsearch:
                           }
                }',
        percentage: 15,
-       params: [
-                 {param1: country, param2: points},{param1: country, param2: price},{param1: country, param2: variety},
-                 {param1: province, param2: points},{param1: province, param2: variety},{param1: variety, param2: country},
-                 {param1: variety, param2: price}
-                ]
+       params: []
       }
   update-queries:
     - {
@@ -297,7 +292,7 @@ elasticsearch:
       }
   delete-queries:
     - {
-       name: queryByCountry,
+       name: deleteByCountry,
        exec: '{
                 "query": {
                            "bool": {
@@ -312,18 +307,18 @@ elasticsearch:
                          }
               }',
        params: [
-                 {param1: Brazil},{param1: Albania},{param1: Serbia}
+                 {param1: Italy},{param1: Slovenia},{param1: Serbia}
                ]
       }
     - {
-       name: queryByPoints,
+       name: deleteByPoints,
        exec: '{
                 "query": {
                            "bool": {
                                      "must": [
                                                {
                                                   "match": {
-                                                             "points": "?1"
+                                                             "points": ?1
                                                            }
                                                }
                                             ]
@@ -331,18 +326,18 @@ elasticsearch:
                          }
               }',
        params: [
-                 {param1: 91},{param1: 92},{param1: 93}
+                 {param1: 84},{param1: 85},{param1: 86}
                ]
       }
     - {
-       name: queryByPrice,
+       name: deleteByPrice,
        exec: '{
                 "query": {
                            "bool": {
                                      "must": [
                                                {
                                                   "match": {
-                                                             "price": "?1"
+                                                             "price": ?1
                                                            }
                                                }
                                             ]
@@ -350,6 +345,6 @@ elasticsearch:
                          }
               }',
        params: [
-                 {param1: 131},{param1: 132},{param1: 133}
+                 {param1: 15},{param1: 16},{param1: 17}
                ]
       }

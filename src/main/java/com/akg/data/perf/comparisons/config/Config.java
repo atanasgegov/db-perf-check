@@ -1,7 +1,12 @@
 package com.akg.data.perf.comparisons.config;
 
+import java.util.List;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+
+import com.akg.data.perf.comparisons.config.pojo.Query;
+import com.akg.data.perf.comparisons.config.pojo.UseCases;
 
 import lombok.Data;
 
@@ -14,7 +19,9 @@ public class Config {
 	private int batchSize;
 	private long frequencyOutputInMs;
 	private UseCases useCases;
-	private String activeUseCase = UseCase.ONE.getValue();
+	private List<Query> searchQueries;
+	private List<Query> updateQueries;
+	private List<Query> deleteQueries;
 	
 	public enum ExecutionMode {
 
@@ -35,25 +42,11 @@ public class Config {
 	
 	public enum Technology {
 
-		ELASTICSEARCH("elasticsearch"); 
+		ELASTICSEARCH("elasticsearch"),
+		MONGODB("mongodb"); 
 
 		private final String name;
 	    private Technology(String name) {
-	        this.name = name;
-	    }
-
-	    public String getValue() {
-			return name;
-		}
-	}
-
-	public enum UseCase {
-
-		ONE("one"),
-	    CRUD("crud"); 
-
-		private final String name;
-	    private UseCase(String name) {
 	        this.name = name;
 	    }
 

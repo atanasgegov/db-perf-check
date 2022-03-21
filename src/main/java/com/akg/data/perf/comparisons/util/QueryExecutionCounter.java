@@ -1,4 +1,4 @@
-package com.akg.data.perf.comparisons.utils;
+package com.akg.data.perf.comparisons.util;
 
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.scheduling.annotation.Async;
 
-import com.akg.data.perf.comparisons.config.Query;
+import com.akg.data.perf.comparisons.config.pojo.Query;
 
 import lombok.extern.slf4j.Slf4j;
 

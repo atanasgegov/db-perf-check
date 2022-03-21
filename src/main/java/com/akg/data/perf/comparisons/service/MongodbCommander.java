@@ -1,0 +1,95 @@
+package com.akg.data.perf.comparisons.service;
+
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+
+import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.akg.data.perf.comparisons.config.MongodbConfig;
+import com.akg.data.perf.comparisons.config.pojo.Query;
+import com.akg.data.perf.comparisons.dto.WineDTO;
+import com.akg.data.perf.comparisons.util.JsonParser;
+import com.akg.data.perf.comparisons.util.QueryUtil;
+import com.mongodb.MongoException;
+import com.mongodb.bulk.BulkWriteResult;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.WriteModel;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@Slf4j
+public class MongodbCommander extends AbstractCommander {
+
+	@Autowired
+	private MongodbConfig mongodbConfig;
+	
+	@Autowired
+	private MongoClient mongoClient;
+	
+	private MongoDatabase db;
+	
+	@PostConstruct
+	public void init() {
+		db = mongoClient.getDatabase(mongodbConfig.getDatabase());
+	}
+	
+	protected int insertRequest(List<WineDTO> data) {
+		try {
+			List<WriteModel<Document>> writeModelList = JsonParser.convertToListOfMongodbModel(data);
+			MongoCollection<Document> collection = db.getCollection(mongodbConfig.getCollection());
+			BulkWriteResult result = collection.bulkWrite(writeModelList);
+			if( result.getInsertedCount() > 0 ) {
+				return 1;
+			}
+
+			return 0;
+        } catch (MongoException me) {
+            log.error("The bulk write operation failed due to an error: " + me);
+    		return 0;
+        }
+	}
+
+	@Override
+	protected int searchRequest(Query query) {
+		
+		String exec = QueryUtil.getQueryWithRandomChoosenParameter(query.getExec(), query.getParams());
+		Bson bsonCmd = Document.parse(exec);
+
+		// Execute the native query
+		Document result = db.runCommand(bsonCmd);
+
+		// Get the output
+		Document cursor = (Document) result.get("cursor");
+		List<Document> docs = (List<Document>) cursor.get("firstBatch");
+		//docs.forEach(d->log.info(d.toString()));
+		
+		return 1;
+	}
+
+	@Override
+	protected int deleteRequest(Query query) {
+		return this.deleteOrUpdateRequest(query);
+	}
+
+	@Override
+	protected int updateRequest(Query query) {
+		return this.deleteOrUpdateRequest(query);
+	}
+	
+	private int deleteOrUpdateRequest(Query query) {
+		String exec = QueryUtil.getQueryWithRandomChoosenParameter(query.getExec(), query.getParams());
+		Bson bsonCmd = Document.parse(exec);
+
+		// Execute the native query
+		Document result = db.runCommand(bsonCmd);
+
+		return (Integer)result.get("n");
+	}
+}

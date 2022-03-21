@@ -11,6 +11,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.akg.data.perf.comparisons.config.pojo.EndPoint;
+import com.akg.data.perf.comparisons.config.pojo.Query;
+
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 

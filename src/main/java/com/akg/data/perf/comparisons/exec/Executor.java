@@ -7,8 +7,12 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.akg.data.perf.comparisons.config.Config;
-import com.akg.data.perf.comparisons.config.Execution;
+import com.akg.data.perf.comparisons.config.ElasticsearchConfig;
+import com.akg.data.perf.comparisons.config.MongodbConfig;
+import com.akg.data.perf.comparisons.config.pojo.Execution;
+import com.akg.data.perf.comparisons.config.pojo.UseCases;
 import com.akg.data.perf.comparisons.service.ElasticsearchCommander;
+import com.akg.data.perf.comparisons.service.MongodbCommander;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,23 +24,30 @@ public class Executor {
 	private Config config;
 	
 	@Autowired
+	private ElasticsearchConfig esConfig;
+	@Autowired
+	private MongodbConfig mongodbConfig;
+	
+	@Autowired
 	private ElasticsearchCommander elasticsearchCommander;
+	@Autowired
+	private MongodbCommander mongodbCommander;
 	
 	@EventListener(ApplicationReadyEvent.class)
 	@Order(1)
 	public void exec() {
 
 		long start = System.currentTimeMillis();
-		if( config.getActiveUseCase().equals( Config.UseCase.ONE.getValue() ) ) {
+		if( config.getUseCases().getActiveUseCase().equals( UseCases.Type.ONE ) ) {
 
 			this.run( config.getUseCases().getOne() );
-		} else if( config.getActiveUseCase().equals( Config.UseCase.CRUD.getValue() ) ) {
+		} else if( config.getUseCases().getActiveUseCase().equals( UseCases.Type.CRUD ) ) {
 
 			for(Execution execution : config.getUseCases().getCrud()) {
 				this.run(execution);
 			}
 		} else {
-			log.warn("Please, check your configuration, probably the wrong value was set for active-use-case: {}", config.getActiveUseCase());		
+			log.warn("Please, check your configuration, probably the wrong value was set for active-use-case: {}", config.getUseCases().getActiveUseCase());		
 		}
 
 		long end = System.currentTimeMillis();
@@ -51,13 +62,25 @@ public class Executor {
 		log.info( "Executing '{}' '{}' queries for {} ms ...", what, mode, execution.getTimeInMs() );
 		if( what.equals( Config.Technology.ELASTICSEARCH.getValue() ) ) {
 			if( mode.equals( Config.ExecutionMode.SEARCH.getValue() ) ) {
-				elasticsearchCommander.search(execution);
+				elasticsearchCommander.search(execution, esConfig.getSearchQueries());
 			} else if( mode.equals( Config.ExecutionMode.INSERTS.getValue() ) ) {
 				elasticsearchCommander.insert(execution);
 			} else if( mode.equals( Config.ExecutionMode.UPDATES.getValue() ) ) {
-				elasticsearchCommander.update(execution);
+				elasticsearchCommander.update(execution, esConfig.getUpdateQueries());
 			} else if( mode.equals( Config.ExecutionMode.DELETES.getValue() ) ) {
-				elasticsearchCommander.delete(execution);
+				elasticsearchCommander.delete(execution, esConfig.getDeleteQueries());
+			} else {
+				log.warn("Wrong execution.mode value: '{}' for execution.what='{}' in the configuration file.", mode, what);
+			}
+		} else if(what.equals( Config.Technology.MONGODB.getValue())) {
+			if( mode.equals( Config.ExecutionMode.SEARCH.getValue() ) ) {
+				mongodbCommander.search(execution, mongodbConfig.getSearchQueries());
+			} else if( mode.equals( Config.ExecutionMode.INSERTS.getValue() ) ) {
+				mongodbCommander.insert(execution);
+			} else if( mode.equals( Config.ExecutionMode.UPDATES.getValue() ) ) {
+				mongodbCommander.update(execution, mongodbConfig.getUpdateQueries());
+			} else if( mode.equals( Config.ExecutionMode.DELETES.getValue() ) ) {
+				mongodbCommander.delete(execution, mongodbConfig.getDeleteQueries());
 			} else {
 				log.warn("Wrong execution.mode value: '{}' for execution.what='{}' in the configuration file.", mode, what);
 			}

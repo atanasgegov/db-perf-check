@@ -1,6 +1,6 @@
 spring:
   profiles:
-    include: elasticsearch
+    include: elasticsearch,mongodb
 
 logging:
   level:
@@ -11,14 +11,11 @@ commons:
   input-data-file: src/main/resources/winemag-data_first150k.csv
   batch-size: 5000
   frequency-output-in-ms: 10000
-  active-use-case: crud # possible values are one, crud
   use-cases:
-    # Execution type possible values:
-    #   what: elasticsearch
-    #   mode: inserts, search, updates, deletes
-    one: {what: elasticsearch, mode: search, time-in-ms: 60000} 
+    active-use-case: one # possible values are one, crud
+    one: {what: elasticsearch, mode: search, time-in-ms: 60000}  # Execution type possible values: what: elasticsearch, mongodb | mode: inserts, search, updates, deletes
     crud:
-      - {what: elasticsearch, mode: inserts, time-in-ms: 1800000} 
-      - {what: elasticsearch, mode: search, time-in-ms: 300000} 
-      - {what: elasticsearch, mode: updates, time-in-ms: 60000}
-      - {what: elasticsearch, mode: deletes, time-in-ms: 60000}
+      - {what: mongodb, mode: inserts, time-in-ms: 1800000} 
+      - {what: mongodb, mode: search, time-in-ms: 300000} 
+      - {what: mongodb, mode: updates, time-in-ms: 60000}
+      - {what: mongodb, mode: deletes, time-in-ms: 60000}

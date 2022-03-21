@@ -1,4 +1,4 @@
-package com.akg.data.perf.comparisons.utils;
+package com.akg.data.perf.comparisons.util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,8 +13,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.io.IOUtils;
 
-import com.akg.data.perf.comparisons.config.Query;
-import com.akg.data.perf.comparisons.config.QueryParams;
+import com.akg.data.perf.comparisons.config.pojo.Query;
+import com.akg.data.perf.comparisons.config.pojo.QueryParams;
 
 import lombok.experimental.UtilityClass;
 

@@ -1,4 +1,4 @@
-package com.akg.data.perf.comparisons.utils;
+package com.akg.data.perf.comparisons.util;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -10,16 +10,16 @@ import java.util.List;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
-import com.akg.data.perf.comparisons.dto.WineMagDTO;
+import com.akg.data.perf.comparisons.dto.WineDTO;
 
 import io.netty.util.internal.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class WineMagLoader {
+public class WinesDataLoader {
 
-	public static List<WineMagDTO> load(int startIndex, int endIndex, String inputDataFile ) throws IOException {
-		List<WineMagDTO> list = new ArrayList<>();
+	public static List<WineDTO> load(int startIndex, int endIndex, String inputDataFile ) throws IOException {
+		List<WineDTO> list = new ArrayList<>();
 		try( Reader in = new FileReader(inputDataFile) ) {
 			Iterable<CSVRecord> records = CSVFormat.RFC4180.parse(in);
 
@@ -32,7 +32,7 @@ public class WineMagLoader {
 					break;
 				}
 
-				WineMagDTO wmDTO = new WineMagDTO();
+				WineDTO wmDTO = new WineDTO();
 				wmDTO.setId(Integer.valueOf(csvRecord.get(0)));
 				wmDTO.setCountry(csvRecord.get(1));
 				wmDTO.setDescription(csvRecord.get(2));

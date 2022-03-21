@@ -1,11 +1,16 @@
-package com.akg.data.perf.comparisons.utils;
+package com.akg.data.perf.comparisons.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.akg.data.perf.comparisons.dto.WineMagDTO;
+import org.bson.Document;
+
+import com.akg.data.perf.comparisons.dto.WineDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.mongodb.client.model.InsertOneModel;
+import com.mongodb.client.model.WriteModel;
 
 import lombok.experimental.UtilityClass;
 
@@ -14,7 +19,7 @@ public class JsonParser {
 
 	private static final String JSON_INDEX = "{ \"index\": {} }";
 	
-	public static String convert( List<WineMagDTO> winesRecords ) {
+	public static String convertToESJson( List<WineDTO> winesRecords ) {
 		
 		StringBuilder json = new StringBuilder();
 		ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
@@ -30,5 +35,21 @@ public class JsonParser {
 		});
 		
 		return json.toString();
+	}
+	
+	public static List<WriteModel<Document>> convertToListOfMongodbModel( List<WineDTO> winesRecords ) {
+		
+		List<WriteModel<Document>> documents = new ArrayList<>();
+		ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+		winesRecords.stream().forEach( c -> {
+			try {
+				Document document = Document.parse(ow.writeValueAsString(c));
+				documents.add(new InsertOneModel<>(document));
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+		});
+
+		return documents;
 	}
 }

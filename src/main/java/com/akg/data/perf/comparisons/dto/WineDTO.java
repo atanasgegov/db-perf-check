@@ -3,7 +3,7 @@ package com.akg.data.perf.comparisons.dto;
 import lombok.Data;
 
 @Data
-public class WineMagDTO {
+public class WineDTO {
 
 	private int id;
 	private String country;

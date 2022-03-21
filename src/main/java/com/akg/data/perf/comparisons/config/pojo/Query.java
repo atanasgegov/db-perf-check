@@ -1,4 +1,4 @@
-package com.akg.data.perf.comparisons.config;
+package com.akg.data.perf.comparisons.config.pojo;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
