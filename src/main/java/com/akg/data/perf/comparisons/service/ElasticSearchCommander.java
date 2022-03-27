@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.http.entity.ContentType;
 import org.apache.http.nio.entity.NStringEntity;
+import org.apache.http.util.EntityUtils;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
@@ -20,7 +21,7 @@ import com.akg.data.perf.comparisons.util.QueryUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Service
+@Service("elasticsearchCommander")
 @Slf4j
 public class ElasticsearchCommander extends AbstractCommander {
 
@@ -28,14 +29,14 @@ public class ElasticsearchCommander extends AbstractCommander {
 	private static final String ID_SUFFIX = "\",";
 	private static final String EXEC_HTTP_REQUEST_MSG = "Executing HTTP request to the endpoint {} with body {}";
 
-	@Autowired
+	@Autowired(required=false)
 	private RestClient restClient;
 
-	@Autowired
+	@Autowired(required=false)
 	private ElasticsearchConfig esConfig;
 
 	@Override
-	protected int insertRequest(List<WineDTO> data) {
+	protected Integer insertRequest(List<WineDTO> data) {
 
 		String endpoint = esConfig.getEndPoint().getInsert();
 		String json = JsonParser.convertToESJson(data);
@@ -54,7 +55,7 @@ public class ElasticsearchCommander extends AbstractCommander {
 	}
 
 	@Override
-	protected int searchRequest(Query query) {
+	protected Integer searchRequest(Query query) {
 
 		Response response = sendRequest( esConfig.getEndPoint().getSearch(), query.getExec(), query.getParams() ); 
 		if (response != null && response.getStatusLine().getStatusCode() < 300) {
@@ -64,33 +65,7 @@ public class ElasticsearchCommander extends AbstractCommander {
 	}
 
 	@Override
-	protected int deleteRequest(Query query) {
-
-		Response response = sendRequest( esConfig.getEndPoint().getDelete(), query.getExec(), query.getParams() );
-		if (response != null && response.getStatusLine().getStatusCode() < 300) {
-			return 1;
-		}
-		return 0;
-	}
-
-	private Response sendRequest(String endpoint, String queryExec, QueryParams[] params) {
-
-		Request request = new Request("POST", endpoint);
-		try {
-			String jsonEntity = QueryUtil.getQueryWithRandomChoosenParameter(queryExec, params);
-			log.debug(EXEC_HTTP_REQUEST_MSG, endpoint, jsonEntity);
-			request.setJsonEntity(jsonEntity);
-			Response response = restClient.performRequest(request);
-			log.debug("Done: {}.", response.getStatusLine());
-			return response;
-		} catch (IOException e) {
-			log.error(ERROR_MSG_SOMETHING_WRONG_HAPPENED_CALLING, endpoint, e.getMessage());
-			return null;
-		}
-	}
-
-	@Override
-	protected int updateRequest(Query query) {
+	protected Integer updateRequest(Query query) {
 
 		int executed = 0;
 		Response response = sendRequest(esConfig.getEndPoint().getSearch(), query.getAdditionalExec(),
@@ -110,5 +85,50 @@ public class ElasticsearchCommander extends AbstractCommander {
 		}
 
 		return executed;
+	}
+
+	@Override
+	protected Integer deleteRequest(Query query) {
+
+		Response response = sendRequest( esConfig.getEndPoint().getDelete(), query.getExec(), query.getParams() );
+		if (response != null && response.getStatusLine().getStatusCode() < 300) {
+			return 1;
+		}
+		return 0;
+	}
+
+	@Override
+	protected Long getMaxId() {
+		try {
+			Request request = new Request("POST", esConfig.getEndPoint().getSearch());
+			request.setJsonEntity( esConfig.getMaxIdQuery() );
+			Response response = restClient.performRequest(request);
+			if (response != null && response.getStatusLine().getStatusCode() < 300) {
+				String responseBody = EntityUtils.toString(response.getEntity());
+				String value = JsonParser.getValueFromJsonDocument(responseBody, "/aggregations/max_id/value");
+				
+				return value!=null?Double.valueOf(value).longValue():null;
+			}
+			return 0L;
+		} catch (IOException e) {
+			log.error(ERROR_MSG_SOMETHING_WRONG_HAPPENED_CALLING, esConfig.getEndPoint().getSearch(), e.getMessage());
+			return null;
+		}
+	}
+
+	private Response sendRequest(String endpoint, String queryExec, QueryParams[] params) {
+
+		Request request = new Request("POST", endpoint);
+		try {
+			String jsonEntity = QueryUtil.getQueryWithRandomChoosenParameter(queryExec, params);
+			log.debug(EXEC_HTTP_REQUEST_MSG, endpoint, jsonEntity);
+			request.setJsonEntity(jsonEntity);
+			Response response = restClient.performRequest(request);
+			log.debug("Done: {}.", response.getStatusLine());
+			return response;
+		} catch (IOException e) {
+			log.error(ERROR_MSG_SOMETHING_WRONG_HAPPENED_CALLING, endpoint, e.getMessage());
+			return null;
+		}
 	}
 }

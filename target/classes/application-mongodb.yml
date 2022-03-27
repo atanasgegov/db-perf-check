@@ -5,6 +5,18 @@ mongodb:
   pass: test
   database: wine
   collection: wines
+  max-id-query: '{
+                 aggregate: "wines",
+                 pipeline: [
+                 { 
+                   $group : { 
+                    _id: null, 
+                    max: { $max : "$id" }
+                   },
+                 }
+                 ],
+                 cursor: {}
+               }'
   search-queries:
     - {
        name: findByCountry,
@@ -115,7 +127,7 @@ mongodb:
                  update: "wines",  
                  updates: [  
                     {  
-                      q: { country: "?1" }, u: { $set: { prices: 85.5 } }, multi: true  
+                      q: { country: "?1" }, u: { $set: { prices: 10 } }, multi: true  
                     }  
                  ],  
                  writeConcern: { w: "majority", wtimeout: 5000 }  
@@ -147,7 +159,7 @@ mongodb:
                  update: "wines",  
                  updates: [  
                     {  
-                      q: { variety: "?1" }, u: { $set: { prices: 87.5 } }, multi: true  
+                      q: { variety: "?1" }, u: { $set: { prices: 11 } }, multi: true  
                     }  
                  ],  
                  writeConcern: { w: "majority", wtimeout: 5000 }  
@@ -163,7 +175,7 @@ mongodb:
                  update: "wines",  
                  updates: [  
                     {  
-                      q: { province: "?1" }, u: { $set: { prices: 88.5 } }, multi: true  
+                      q: { province: "?1" }, u: { $set: { prices: 15 } }, multi: true  
                     }  
                  ],  
                  writeConcern: { w: "majority", wtimeout: 5000 }  

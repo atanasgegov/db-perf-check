@@ -1,18 +1,21 @@
 package com.akg.data.perf.comparisons.exec;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import com.akg.data.perf.comparisons.config.Config;
-import com.akg.data.perf.comparisons.config.ElasticsearchConfig;
-import com.akg.data.perf.comparisons.config.MongodbConfig;
+import com.akg.data.perf.comparisons.config.AbstractConfig;
+import com.akg.data.perf.comparisons.config.CommonConfig;
 import com.akg.data.perf.comparisons.config.pojo.Execution;
 import com.akg.data.perf.comparisons.config.pojo.UseCases;
-import com.akg.data.perf.comparisons.service.ElasticsearchCommander;
-import com.akg.data.perf.comparisons.service.MongodbCommander;
+import com.akg.data.perf.comparisons.service.AbstractCommander;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,72 +24,61 @@ import lombok.extern.slf4j.Slf4j;
 public class Executor {
 	
 	@Autowired
-	private Config config;
+	private CommonConfig commonConfig;
 	
-	@Autowired
-	private ElasticsearchConfig esConfig;
-	@Autowired
-	private MongodbConfig mongodbConfig;
+	@Autowired 
+	private BeanFactory beanFactory;
 	
-	@Autowired
-	private ElasticsearchCommander elasticsearchCommander;
-	@Autowired
-	private MongodbCommander mongodbCommander;
-
+	private ScheduledExecutorService shutdowner = Executors.newScheduledThreadPool(1);
+	
 	@EventListener(ApplicationReadyEvent.class)
 	@Order(1)
 	public void exec() {
 
-		long start = System.currentTimeMillis();
-		if( config.getUseCases().getActiveUseCase().equals( UseCases.Type.ONE ) ) {
+	    long start = System.currentTimeMillis();
+		if( commonConfig.getUseCases().getActiveUseCase().equals( UseCases.Type.ONE ) ) {
 
-			this.run( config.getUseCases().getOne() );
-		} else if( config.getUseCases().getActiveUseCase().equals( UseCases.Type.CRUD ) ) {
+			this.run( commonConfig.getUseCases().getOne() );
+		} else if( commonConfig.getUseCases().getActiveUseCase().equals( UseCases.Type.CRUD ) ) {
 
-			for(Execution execution : config.getUseCases().getCrud()) {
+			for(Execution execution : commonConfig.getUseCases().getCrud()) {
 				this.run(execution);
 			}
 		} else {
-			log.warn("Please, check your configuration, probably the wrong value was set for active-use-case: {}", config.getUseCases().getActiveUseCase());		
+			log.warn("Please, check your configuration, probably the wrong value was set for active-use-case: {}", commonConfig.getUseCases().getActiveUseCase());		
 		}
 
 		long end = System.currentTimeMillis();
 		log.info("Elapsed Time in seconds: "+ (double)(end-start)/1000);
-		System.exit(0);
+		int shutdownAfter = 1;
+		log.info("The application will shutdown in {} seconds.", shutdownAfter);
+		this.shutdown(shutdownAfter);
 	}
 
 	private void run( Execution execution ) {
 
 		String what = execution.getWhat();
 		String mode = execution.getMode();
+		AbstractConfig config = beanFactory.getBean( what+"Config", AbstractConfig.class );
+		AbstractCommander commander = beanFactory.getBean(what+"Commander", AbstractCommander.class);
+
 		log.info( "Executing '{}' '{}' queries for {} ms ...", what, mode, execution.getTimeInMs() );
-		if( what.equals( Config.Technology.ELASTICSEARCH.getValue() ) ) {
-			if( mode.equals( Config.ExecutionMode.SEARCH.getValue() ) ) {
-				elasticsearchCommander.search(execution, esConfig.getSearchQueries());
-			} else if( mode.equals( Config.ExecutionMode.INSERTS.getValue() ) ) {
-				elasticsearchCommander.insert(execution);
-			} else if( mode.equals( Config.ExecutionMode.UPDATES.getValue() ) ) {
-				elasticsearchCommander.update(execution, esConfig.getUpdateQueries());
-			} else if( mode.equals( Config.ExecutionMode.DELETES.getValue() ) ) {
-				elasticsearchCommander.delete(execution, esConfig.getDeleteQueries());
-			} else {
-				log.warn("Wrong execution.mode value: '{}' for execution.what='{}' in the configuration file.", mode, what);
-			}
-		} else if(what.equals( Config.Technology.MONGODB.getValue())) {
-			if( mode.equals( Config.ExecutionMode.SEARCH.getValue() ) ) {
-				mongodbCommander.search(execution, mongodbConfig.getSearchQueries());
-			} else if( mode.equals( Config.ExecutionMode.INSERTS.getValue() ) ) {
-				mongodbCommander.insert(execution);
-			} else if( mode.equals( Config.ExecutionMode.UPDATES.getValue() ) ) {
-				mongodbCommander.update(execution, mongodbConfig.getUpdateQueries());
-			} else if( mode.equals( Config.ExecutionMode.DELETES.getValue() ) ) {
-				mongodbCommander.delete(execution, mongodbConfig.getDeleteQueries());
-			} else {
-				log.warn("Wrong execution.mode value: '{}' for execution.what='{}' in the configuration file.", mode, what);
-			}
+		if( mode.equals( AbstractConfig.ExecutionMode.SEARCH.getValue() ) ) {
+			commander.search(execution, config.getSearchQueries());
+		} else if( mode.equals( AbstractConfig.ExecutionMode.INSERTS.getValue() ) ) {
+			commander.insert(execution);
+		} else if( mode.equals( AbstractConfig.ExecutionMode.UPDATES.getValue() ) ) {
+			commander.update(execution, config.getUpdateQueries());
+		} else if( mode.equals( AbstractConfig.ExecutionMode.DELETES.getValue() ) ) {
+			commander.delete(execution, config.getDeleteQueries());
 		} else {
-			log.warn("Wrong execution.what value: '{}' in the configuration file.", what);
+			log.warn("Wrong execution.mode value: '{}' for execution.what='{}' in the configuration file.", mode, what);
 		}
+	}
+	
+	private void shutdown(int seconds) {
+		Runnable shutdownerTask = () -> System.exit(0);
+		shutdowner.schedule(shutdownerTask, seconds, TimeUnit.SECONDS);
 	}
 }
 

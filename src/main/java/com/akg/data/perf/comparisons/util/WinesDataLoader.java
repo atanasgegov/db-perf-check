@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class WinesDataLoader {
 
-	public static List<WineDTO> load(int startIndex, int endIndex, String inputDataFile ) throws IOException {
+	public static List<WineDTO> load(int startIndex, int endIndex, String inputDataFile, long maxId ) throws IOException {
 		List<WineDTO> list = new ArrayList<>();
 		try( Reader in = new FileReader(inputDataFile) ) {
 			Iterable<CSVRecord> records = CSVFormat.RFC4180.parse(in);
@@ -33,7 +33,8 @@ public class WinesDataLoader {
 				}
 
 				WineDTO wmDTO = new WineDTO();
-				wmDTO.setId(Integer.valueOf(csvRecord.get(0)));
+				wmDTO.setId(++maxId);
+				wmDTO.setNum(Integer.valueOf(csvRecord.get(0)));
 				wmDTO.setCountry(csvRecord.get(1));
 				wmDTO.setDescription(csvRecord.get(2));
 				wmDTO.setDesignation(csvRecord.get(3));

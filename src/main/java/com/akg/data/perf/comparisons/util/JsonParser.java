@@ -7,7 +7,9 @@ import org.bson.Document;
 
 import com.akg.data.perf.comparisons.dto.WineDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.mongodb.client.model.InsertOneModel;
 import com.mongodb.client.model.WriteModel;
@@ -51,5 +53,17 @@ public class JsonParser {
 		});
 
 		return documents;
+	}
+	
+	public static String getValueFromJsonDocument( String json, String jsonPointerExpression ) {
+		ObjectReader reader = new ObjectMapper().reader();
+		JsonNode root;
+		try {
+			root = reader.readTree(json);
+			return root.at(jsonPointerExpression).asText();
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }

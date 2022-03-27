@@ -23,24 +23,26 @@ import com.mongodb.client.model.WriteModel;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Service
+@Service("mongodbCommander")
 @Slf4j
 public class MongodbCommander extends AbstractCommander {
 
-	@Autowired
+	@Autowired(required=false)
 	private MongodbConfig mongodbConfig;
-	
-	@Autowired
+
+	@Autowired(required=false)
 	private MongoClient mongoClient;
-	
+
 	private MongoDatabase db;
-	
+
 	@PostConstruct
 	public void init() {
-		db = mongoClient.getDatabase(mongodbConfig.getDatabase());
+		if( mongoClient != null ) {
+			db = mongoClient.getDatabase(mongodbConfig.getDatabase());
+		}
 	}
-	
-	protected int insertRequest(List<WineDTO> data) {
+
+	protected Integer insertRequest(List<WineDTO> data) {
 		try {
 			List<WriteModel<Document>> writeModelList = JsonParser.convertToListOfMongodbModel(data);
 			MongoCollection<Document> collection = db.getCollection(mongodbConfig.getCollection());
@@ -57,8 +59,8 @@ public class MongodbCommander extends AbstractCommander {
 	}
 
 	@Override
-	protected int searchRequest(Query query) {
-		
+	protected Integer searchRequest(Query query) {
+
 		String exec = QueryUtil.getQueryWithRandomChoosenParameter(query.getExec(), query.getParams());
 		Bson bsonCmd = Document.parse(exec);
 
@@ -74,12 +76,12 @@ public class MongodbCommander extends AbstractCommander {
 	}
 
 	@Override
-	protected int deleteRequest(Query query) {
+	protected Integer deleteRequest(Query query) {
 		return this.deleteOrUpdateRequest(query);
 	}
 
 	@Override
-	protected int updateRequest(Query query) {
+	protected Integer updateRequest(Query query) {
 		return this.deleteOrUpdateRequest(query);
 	}
 	
@@ -91,5 +93,18 @@ public class MongodbCommander extends AbstractCommander {
 		Document result = db.runCommand(bsonCmd);
 
 		return (Integer)result.get("n");
+	}
+
+	@Override
+	protected Long getMaxId() {
+		Bson bsonCmd = Document.parse(mongodbConfig.getMaxIdQuery());
+
+		// Execute the native query
+		Document result = db.runCommand(bsonCmd);
+		Document cursor = (Document) result.get("cursor");
+		List<Document> docs = (List<Document>) cursor.get("firstBatch");
+		Document maxId = docs.get(0);
+		
+		return Long.valueOf( maxId.getInteger("max") );
 	}
 }

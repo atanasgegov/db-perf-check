@@ -9,7 +9,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
-import com.akg.data.perf.comparisons.config.Config;
+import com.akg.data.perf.comparisons.config.CommonConfig;
 import com.akg.data.perf.comparisons.config.pojo.Execution;
 import com.akg.data.perf.comparisons.config.pojo.Query;
 import com.akg.data.perf.comparisons.dto.WineDTO;
@@ -26,12 +26,13 @@ public abstract class AbstractCommander {
 	protected static final String ERROR_MSG_SOMETHING_WRONG_HAPPENED_CALLING = "Something wrong happened calling {}, error: {}";
 	
 	@Autowired
-	protected Config config;
+	protected CommonConfig commonConfig;
 	
-	protected abstract int insertRequest(List<WineDTO> data);
-	protected abstract int searchRequest(Query query);
-	protected abstract int deleteRequest(Query query);
-	protected abstract int updateRequest(Query query);
+	protected abstract Integer insertRequest(List<WineDTO> data);
+	protected abstract Integer searchRequest(Query query);
+	protected abstract Integer deleteRequest(Query query);
+	protected abstract Integer updateRequest(Query query);
+	protected abstract Long getMaxId();
 
 	public int search(Execution execution, List<Query> queries) {
 
@@ -39,13 +40,13 @@ public abstract class AbstractCommander {
 		long endTimeInMs = start + (execution.getTimeInMs());
 		Map<Integer, Query> queriesMap = QueryUtil.calculatePercentageExecForQueries( queries);
 		QueryExecutionCounter queryExecutionCounter = new QueryExecutionCounter(start, queries);
-		queryExecutionCounter.printReccurently(config.getFrequencyOutputInMs());
+		queryExecutionCounter.printReccurently(commonConfig.getFrequencyOutputInMs());
 
 		int executed = 0;
 		while (System.currentTimeMillis() <= endTimeInMs) {
 			int index = ThreadLocalRandom.current().nextInt(0, 100);
 			Query query = queriesMap.get(index);
-			int isSuccessful = searchRequest(query);
+			Integer isSuccessful = searchRequest(query);
 			if (isSuccessful > 0) {
 				executed = executed + 1;
 				queryExecutionCounter.increment(query);
@@ -63,23 +64,24 @@ public abstract class AbstractCommander {
 		long endTimeInMs = start + (execution.getTimeInMs());
 		Query insertQuery = new Query("Batch Insert From CSV File");
 		QueryExecutionCounter queryExecutionCounter = new QueryExecutionCounter(start, Arrays.asList(insertQuery));
-		queryExecutionCounter.printReccurently(config.getFrequencyOutputInMs());
+		queryExecutionCounter.printReccurently(commonConfig.getFrequencyOutputInMs());
 
+		long maxId = this.getMaxId(); 
 		int executed = 0;
 		while (System.currentTimeMillis() <= endTimeInMs) {
 			int sizeOfRecordsForInsert = 0;
 			try {
-				sizeOfRecordsForInsert = WinesDataLoader.getNumberOfRows(config.getInputDataFile());
+				sizeOfRecordsForInsert = WinesDataLoader.getNumberOfRows(commonConfig.getInputDataFile());
 			} catch (IOException e) {
 				log.error(ERROR_MSG_SOMETHING_WRONG_HAPPENED, e.getMessage());
 			}
-			int batchSize = config.getBatchSize();
+			int batchSize = commonConfig.getBatchSize();
 			int batchSizeStart = 1; // skip the header
 			int batchSizeEnd = ( batchSize > sizeOfRecordsForInsert ? sizeOfRecordsForInsert : batchSize );
 			while (batchSizeStart <= sizeOfRecordsForInsert) {
 				List<WineDTO> data = null;
 				try {
-					data = WinesDataLoader.load(batchSizeStart, batchSizeEnd, config.getInputDataFile());
+					data = WinesDataLoader.load(batchSizeStart, batchSizeEnd, commonConfig.getInputDataFile(), maxId);
 				} catch (IOException e) {
 					log.error(ERROR_MSG_SOMETHING_WRONG_HAPPENED, e.getMessage());
 				}
@@ -91,6 +93,7 @@ public abstract class AbstractCommander {
 				queryExecutionCounter.increment(insertQuery, (batchSizeEnd-batchSizeStart));
 				batchSizeStart = batchSizeEnd + 1;
 				batchSizeEnd = ( batchSizeEnd + batchSize ) > sizeOfRecordsForInsert ? sizeOfRecordsForInsert : ( batchSizeEnd + batchSize );
+				maxId = maxId + data.size();
 			}
 		}
 
@@ -106,9 +109,9 @@ public abstract class AbstractCommander {
 		long start = System.currentTimeMillis();
 		long endTimeInMs = start + (execution.getTimeInMs());
 		QueryExecutionCounter queryExecutionCounter = new QueryExecutionCounter(start, updateQueries);
-		queryExecutionCounter.printReccurently(config.getFrequencyOutputInMs());
+		queryExecutionCounter.printReccurently(commonConfig.getFrequencyOutputInMs());
 
-		int executed = 0;
+		Integer executed = 0;
 		while (System.currentTimeMillis() <= endTimeInMs) {
 			int index = ThreadLocalRandom.current().nextInt(0, 100);
 			Query query = queriesMap.get(index);
@@ -126,9 +129,9 @@ public abstract class AbstractCommander {
 		long start = System.currentTimeMillis();
 		long endTimeInMs = start + (execution.getTimeInMs());
 		QueryExecutionCounter queryExecutionCounter = new QueryExecutionCounter(start, deleteQueries);
-		queryExecutionCounter.printReccurently(config.getFrequencyOutputInMs());
+		queryExecutionCounter.printReccurently(commonConfig.getFrequencyOutputInMs());
 
-		int executed = 0;
+		Integer executed = 0;
 		for (Query query : deleteQueries) {
 			executed = deleteRequest(query);
 			if (executed>0) {

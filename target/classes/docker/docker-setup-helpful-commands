@@ -15,3 +15,4 @@ db.wines.createIndex( {country : 1} );
 db.wines.createIndex( {points : 1} );
 db.wines.createIndex( {price : 1} );
 db.wines.createIndex( {country : 1, points: 1} );
+

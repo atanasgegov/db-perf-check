@@ -6,6 +6,12 @@ elasticsearch:
   connection-timeout: 5000
   end-point: { search: /wine/_search, insert: /wine/_bulk, update: /wine/_update/, delete: /wine/_delete_by_query }
   io-thread-count: 1
+  max-id-query: '{
+                  "size": 0,
+                  "aggs": {
+                            "max_id": { "max": { "field": "id" } }
+                          }
+               }'
   search-queries:
     - {
        name: findByCountry,
@@ -177,7 +183,7 @@ elasticsearch:
                 "source": "ctx._source.price = params.price",
                 "lang": "painless",
                 "params" : {
-                  "price" : 96
+                  "price" : 10
                   }
                 }
         }',
@@ -237,7 +243,7 @@ elasticsearch:
                 "source": "ctx._source.price = params.price",
                 "lang": "painless",
                 "params" : {
-                  "price" : 96
+                  "price" : 11
                 }
               }
         }',
@@ -267,7 +273,7 @@ elasticsearch:
                 "source": "ctx._source.price = params.price",
                 "lang": "painless",
                 "params" : {
-                  "price" : 96
+                  "price" : 15
                 }
               }
         }',

@@ -1,6 +1,7 @@
 spring:
-  profiles:
-    include: elasticsearch,mongodb
+  profiles: 
+    active: mongodb # elasticsearch,mongodb,cassandra
+ 
 
 logging:
   level:
@@ -12,10 +13,14 @@ commons:
   batch-size: 5000
   frequency-output-in-ms: 10000
   use-cases:
-    active-use-case: one # possible values are one, crud
-    one: {what: elasticsearch, mode: search, time-in-ms: 60000}  # Execution type possible values: what: elasticsearch, mongodb | mode: inserts, search, updates, deletes
+    # possible values are: one, crud
+    active-use-case: crud
+    # Execution type possible values: 
+    #   what: elasticsearch, mongodb 
+    #   mode: inserts, search, updates, deletes
+    one: {what: cassandra, mode: search, time-in-ms: 10000}  
     crud:
-      - {what: mongodb, mode: inserts, time-in-ms: 1800000} 
-      - {what: mongodb, mode: search, time-in-ms: 300000} 
-      - {what: mongodb, mode: updates, time-in-ms: 60000}
-      - {what: mongodb, mode: deletes, time-in-ms: 60000}
+      - {what: mongodb, mode: inserts, time-in-ms: 10000} 
+      - {what: mongodb, mode: search, time-in-ms: 10000} 
+      - {what: mongodb, mode: updates, time-in-ms: 10000}
+      - {what: mongodb, mode: deletes, time-in-ms: 10000}

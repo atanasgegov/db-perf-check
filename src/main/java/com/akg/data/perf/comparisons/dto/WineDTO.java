@@ -5,7 +5,8 @@ import lombok.Data;
 @Data
 public class WineDTO {
 
-	private int id;
+	private long id;
+	private int num;
 	private String country;
 	private String description;
 	private String designation;
