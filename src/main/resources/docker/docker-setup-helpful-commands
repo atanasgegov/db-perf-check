@@ -1,18 +1,63 @@
-# docker commands
+# docker commands that help in 
+#  - container setup ( important memory setup, create needed database collections/tables/indexes, etc. )
+#  - check the data with specific queries
+#  - etc.
 
+###############
 # elasticsearch
-open powershell
-wsl -d docker-desktop
-sysctl -w vm.max_map_count=262144
+###############
+	open powershell
+	wsl -d docker-desktop
+	sysctl -w vm.max_map_count=262144
 
+#########
 # mongodb
-mongo -u root -p example
-use wine;
-db.createUser({user:"test",pwd:"test",roles:["readWrite","dbAdmin"]});
-db.createCollection('wines');
-show collections;
-db.wines.createIndex( {country : 1} );
-db.wines.createIndex( {points : 1} );
-db.wines.createIndex( {price : 1} );
-db.wines.createIndex( {country : 1, points: 1} );
+#########
+	mongo -u root -p example
+	use wine;
+	db.createUser({user:"test",pwd:"test",roles:["readWrite","dbAdmin"]});
+	db.createCollection('wines');
+	show collections;
+	db.wines.createIndex( {country : 1} );
+	db.wines.createIndex( {points : 1} );
+	db.wines.createIndex( {price : 1} );
+	db.wines.createIndex( {country : 1, points: 1} );
+	# get all indexes for wines collection
+	db.wines.getIndexes();
+	# get max Id
+	db.wines.find().sort({id:-1}).limit(1);
 
+###########
+# cassandra
+###########
+	docker exec -it cassandra_cassandra_1 bash
+	cqlsh -u cassandra -p cassandra
+	
+	CREATE KEYSPACE wines
+	  WITH REPLICATION = { 
+	   'class' : 'SimpleStrategy', 
+	   'replication_factor' : 1 
+	  };
+	  
+	CREATE KEYSPACE IF NOT EXISTS wines WITH replication={'class':'NetworkTopologyStrategy', 'datacenter1': '1'};
+	
+	CREATE TABLE wines.wine(
+	 id bigint,
+	 num int,
+	 country varchar,
+	 description varchar,
+	 designation varchar,
+	 points int,
+	 price float,
+	 province varchar,
+	 region1 varchar,
+	 region2 varchar,
+	 variety varchar,
+	 winery varchar,
+	 PRIMARY KEY (id)
+	);
+	
+	describe keyspaces;
+	describe tables;
+	
+	select * from wines.wine;
