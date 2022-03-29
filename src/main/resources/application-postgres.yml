@@ -3,7 +3,7 @@ elasticsearch:
   port: 5432
   user: root
   pass: root
-  max-id-query: 'select id
+  max-id-query: 'select max(id)
                  from wines.wine'
   search-queries:
     - {
