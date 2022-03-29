@@ -61,3 +61,27 @@
 	describe tables;
 	
 	select * from wines.wine;
+	
+############
+# postgresql
+############
+    # connect to postgres database with user root and password root  
+    
+	create schema wines;
+
+	CREATE TABLE wines.wine(
+	 id SERIAL,
+	 num integer,
+	 country text,
+	 description text,
+	 designation text,
+	 points int,
+	 price double precision,
+	 province text,
+	 region1 text,
+	 region2 text,
+	 variety text,
+	 winery text,
+	 PRIMARY KEY (id)
+	); 
+	
