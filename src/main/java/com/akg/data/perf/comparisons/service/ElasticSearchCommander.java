@@ -116,6 +116,18 @@ public class ElasticsearchCommander extends AbstractCommander {
 		}
 	}
 
+	@Override
+	public void closeResources() {
+		if( restClient != null ) {
+			try {
+				restClient.close();
+			} catch (IOException e) {
+				log.error(e.getMessage());
+			}
+			log.info(INFO_MSG_RESOURCES_CLOSED);
+		}
+	}
+
 	private Response sendRequest(String endpoint, String queryExec, QueryParams[] params) {
 
 		Request request = new Request("POST", endpoint);

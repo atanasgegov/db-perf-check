@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,20 +34,22 @@ public class PostgresCommander extends AbstractCommander {
 	
 	@PostConstruct
 	protected void init() {
-		
 		try {
 			conn = dataSource.getConnection();
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			log.error(e.getMessage());
 		}
 	}
-	
-	@PreDestroy
-	private void destroy() {
-		try {
-			conn.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
+
+	@Override
+	public void closeResources() {
+		if (conn != null) {
+			try {
+				conn.close();
+				log.info(INFO_MSG_RESOURCES_CLOSED);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	

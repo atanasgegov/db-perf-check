@@ -58,7 +58,30 @@ public class CassandraCommander extends AbstractCommander {
 	protected Integer updateRequest(Query query) {
 		return this.updateOrDeleteRequest(query);
 	}
-	
+
+	@Override
+	protected Long getMaxId() {
+
+		ResultSet rs = cqlSession.execute(cassandraConfig.getMaxIdQuery());
+		Row row = rs.one();
+		Long maxId = 0L;
+		try {
+			maxId = row.getLong("id");
+		} catch( Exception e ) {
+			log.error( e.getMessage() );
+		}
+
+		return maxId;
+	}
+
+	@Override
+	public void closeResources() {
+		if(cqlSession != null) {
+			cqlSession.close();
+			log.info(INFO_MSG_RESOURCES_CLOSED);
+		}
+	}
+
 	private Integer updateOrDeleteRequest(Query query) {
 		ResultSet rs = this.executeQuery(query.getAdditionalExec(),query.getParams());
 		List<Row> rows = rs.all();
@@ -73,20 +96,5 @@ public class CassandraCommander extends AbstractCommander {
 
 		String cql = QueryUtil.getQueryWithRandomChoosenParameter(exec, params);
 		return cqlSession.execute( cql );
-	}
-	
-	@Override
-	protected Long getMaxId() {
-
-		ResultSet rs = cqlSession.execute(cassandraConfig.getMaxIdQuery());
-		Row row = rs.one();
-		Long maxId = 0L;
-		try {
-			maxId = row.getLong("id");
-		} catch( Exception e ) {
-			log.error( e.getMessage() );
-		}
-
-		return maxId;
 	}
 }

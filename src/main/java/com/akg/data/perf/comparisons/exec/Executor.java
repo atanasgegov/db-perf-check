@@ -7,6 +7,8 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -28,6 +30,9 @@ public class Executor {
 	
 	@Autowired 
 	private BeanFactory beanFactory;
+	
+	@Autowired
+	private ApplicationContext context;
 	
 	private ScheduledExecutorService shutdowner = Executors.newScheduledThreadPool(1);
 	
@@ -77,7 +82,10 @@ public class Executor {
 	}
 	
 	private void shutdown(int seconds) {
-		Runnable shutdownerTask = () -> System.exit(0);
+		Runnable shutdownerTask = () -> { 
+			((ConfigurableApplicationContext) context).close();
+			System.exit(0);
+		};
 		shutdowner.schedule(shutdownerTask, seconds, TimeUnit.SECONDS);
 	}
 }

@@ -85,16 +85,6 @@ public class MongodbCommander extends AbstractCommander {
 		return this.deleteOrUpdateRequest(query);
 	}
 	
-	private int deleteOrUpdateRequest(Query query) {
-		String exec = QueryUtil.getQueryWithRandomChoosenParameter(query.getExec(), query.getParams());
-		Bson bsonCmd = Document.parse(exec);
-
-		// Execute the native query
-		Document result = db.runCommand(bsonCmd);
-
-		return (Integer)result.get("n");
-	}
-
 	@Override
 	protected Long getMaxId() {
 		Bson bsonCmd = Document.parse(mongodbConfig.getMaxIdQuery());
@@ -106,5 +96,23 @@ public class MongodbCommander extends AbstractCommander {
 		Document maxId = docs.get(0);
 		
 		return Long.valueOf( maxId.getInteger("max") );
+	}
+
+	@Override
+	public void closeResources() {
+		if( mongoClient != null ) {
+			mongoClient.close();
+			log.info(INFO_MSG_RESOURCES_CLOSED);
+		}
+	}
+
+	private int deleteOrUpdateRequest(Query query) {
+		String exec = QueryUtil.getQueryWithRandomChoosenParameter(query.getExec(), query.getParams());
+		Bson bsonCmd = Document.parse(exec);
+
+		// Execute the native query
+		Document result = db.runCommand(bsonCmd);
+
+		return (Integer)result.get("n");
 	}
 }

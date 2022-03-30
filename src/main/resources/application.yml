@@ -1,6 +1,6 @@
 spring:
   profiles: 
-    active: postgres # elasticsearch,mongodb,cassandra,postgres
+    active: cassandra # elasticsearch,mongodb,cassandra,postgres
  
 
 logging:
@@ -18,9 +18,9 @@ commons:
     # Execution type possible values: 
     #   what: elasticsearch, mongodb 
     #   mode: inserts, search, updates, deletes
-    one: {what: postgres, mode: inserts, time-in-ms: 60000}  
+    one: {what: cassandra, mode: inserts, time-in-ms: 10000}  
     crud:
-      - {what: postgres, mode: inserts, time-in-ms: 1800000} 
-      - {what: postgres, mode: search, time-in-ms: 300000} 
-      - {what: postgres, mode: updates, time-in-ms: 60000}
-      - {what: postgres, mode: deletes, time-in-ms: 60000}
+      - {what: cassandra, mode: inserts, time-in-ms: 1800000} 
+      - {what: cassandra, mode: search, time-in-ms: 300000} 
+      - {what: cassandra, mode: updates, time-in-ms: 60000}
+      - {what: cassandra, mode: deletes, time-in-ms: 60000}

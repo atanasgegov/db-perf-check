@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
+import javax.annotation.PreDestroy;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
@@ -24,6 +26,7 @@ public abstract class AbstractCommander {
 	
 	protected static final String ERROR_MSG_SOMETHING_WRONG_HAPPENED = "Something wrong happened error: {}";
 	protected static final String ERROR_MSG_SOMETHING_WRONG_HAPPENED_CALLING = "Something wrong happened calling {}, error: {}";
+	protected static final String INFO_MSG_RESOURCES_CLOSED = "Underlying resources closed.";
 	
 	@Autowired
 	protected CommonConfig commonConfig;
@@ -33,6 +36,8 @@ public abstract class AbstractCommander {
 	protected abstract Integer deleteRequest(Query query);
 	protected abstract Integer updateRequest(Query query);
 	protected abstract Long getMaxId();
+	@PreDestroy
+	public abstract void closeResources();
 
 	public int search(Execution execution, List<Query> queries) {
 
