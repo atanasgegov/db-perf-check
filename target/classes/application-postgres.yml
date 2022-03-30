@@ -1,6 +1,7 @@
-elasticsearch:
+postgres:
   host: localhost
   port: 5432
+  url: jdbc:postgresql://localhost:5432/postgres
   user: root
   pass: root
   max-id-query: 'select max(id)
@@ -120,7 +121,7 @@ elasticsearch:
     - {
         name: updatePricesByProvince ,
         exec: 'update wines.wine
-               set prices = 15
+               set price = 15
                where province = ''?1''',
         percentage: 15,
         params: [
