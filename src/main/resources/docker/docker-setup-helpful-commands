@@ -83,5 +83,9 @@
 	 variety text,
 	 winery text,
 	 PRIMARY KEY (id)
-	); 
+	);
+	
+	create index idx_wine_country_points on wines.wine(country,points);
+	
+	create index idx_wine_price on wines.wine(price);
 	
