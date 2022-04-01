@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service("cassandraCommander")
 @Slf4j
-public class CassandraCommander extends AbstractCommander {
+public class CassandraCommand extends AbstractCommand {
 
 	@Autowired(required=false)
 	private CassandraConfig cassandraConfig;

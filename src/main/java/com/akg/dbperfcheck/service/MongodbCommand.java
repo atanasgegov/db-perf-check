@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service("mongodbCommander")
 @Slf4j
-public class MongodbCommander extends AbstractCommander {
+public class MongodbCommand extends AbstractCommand {
 
 	@Autowired(required=false)
 	private MongodbConfig mongodbConfig;

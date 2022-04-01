@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service("postgresCommander")
 @Slf4j
-public class PostgresCommander extends AbstractCommander {
+public class PostgresCommand extends AbstractCommand {
 
 	@Autowired(required=false)
 	private PostgresConfig postgresConfig;

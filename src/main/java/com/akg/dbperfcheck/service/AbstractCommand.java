@@ -22,7 +22,7 @@ import com.akg.dbperfcheck.util.WinesDataLoader;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public abstract class AbstractCommander {
+public abstract class AbstractCommand {
 	
 	protected static final String ERROR_MSG_SOMETHING_WRONG_HAPPENED = "Something wrong happened error: {}";
 	protected static final String ERROR_MSG_SOMETHING_WRONG_HAPPENED_CALLING = "Something wrong happened calling {}, error: {}";

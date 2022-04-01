@@ -17,7 +17,7 @@ import com.akg.dbperfcheck.config.AbstractConfig;
 import com.akg.dbperfcheck.config.CommonConfig;
 import com.akg.dbperfcheck.config.pojo.Execution;
 import com.akg.dbperfcheck.config.pojo.UseCases;
-import com.akg.dbperfcheck.service.AbstractCommander;
+import com.akg.dbperfcheck.service.AbstractCommand;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -65,17 +65,17 @@ public class Executor {
 		String what = execution.getWhat();
 		String mode = execution.getMode();
 		AbstractConfig config = beanFactory.getBean( what+"Config", AbstractConfig.class );
-		AbstractCommander commander = beanFactory.getBean(what+"Commander", AbstractCommander.class);
+		AbstractCommand command = beanFactory.getBean(what+"Commander", AbstractCommand.class);
 
 		log.info( "Executing '{}' '{}' queries for {} ms ...", what, mode, execution.getTimeInMs() );
 		if( mode.equals( AbstractConfig.ExecutionMode.SEARCH.getValue() ) ) {
-			commander.search(execution, config.getSearchQueries());
+			command.search(execution, config.getSearchQueries());
 		} else if( mode.equals( AbstractConfig.ExecutionMode.INSERTS.getValue() ) ) {
-			commander.insert(execution);
+			command.insert(execution);
 		} else if( mode.equals( AbstractConfig.ExecutionMode.UPDATES.getValue() ) ) {
-			commander.update(execution, config.getUpdateQueries());
+			command.update(execution, config.getUpdateQueries());
 		} else if( mode.equals( AbstractConfig.ExecutionMode.DELETES.getValue() ) ) {
-			commander.delete(execution, config.getDeleteQueries());
+			command.delete(execution, config.getDeleteQueries());
 		} else {
 			log.warn("Wrong execution.mode value: '{}' for execution.what='{}' in the configuration file.", mode, what);
 		}

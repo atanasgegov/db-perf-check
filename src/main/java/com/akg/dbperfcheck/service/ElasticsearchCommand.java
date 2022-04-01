@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service("elasticsearchCommander")
 @Slf4j
-public class ElasticsearchCommander extends AbstractCommander {
+public class ElasticsearchCommand extends AbstractCommand {
 
 	private static final String ID_PRFIX = "\"_id\":\"";
 	private static final String ID_SUFFIX = "\",";
