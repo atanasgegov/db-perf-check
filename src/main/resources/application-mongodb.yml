@@ -104,9 +104,9 @@ mongodb:
        percentage: 15,
        params: []
       }
-  update-queries:
+  update-queries: # list of com.akg.dbperfcheck.config.pojo.Query objects used for the UPDATE queries
     - {
-        name: updatePointsByCountry,
+        name: updatePointsByCountry, # name of the qiery
         exec: '{  
                  update: "wines",  
                  updates: [  
@@ -115,11 +115,11 @@ mongodb:
                     }  
                  ],  
                  writeConcern: { w: "majority", wtimeout: 5000 }  
-              }',
-        percentage: 40,
+              }', # the actual query
+        percentage: 40, # this is the percentage of executions of this query among all executed queries
         params: [
                   {param1: Bulgaria},{param1: Romania},{param1: Greece},{param1: Macedonia},{param1: Turkey},{param1: Germany},{param1: France},{param1: Italy},{param1: Austria},{param1: Spain},{param1: Portugal},{param1: Argentina}
-                ]
+                ] # predefined parameter values, one of them randomly will be picked up and pass to the query above
       }
     - {
         name: updatePricesByCountry,

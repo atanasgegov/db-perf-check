@@ -1,0 +1,7 @@
+/target/
+/target/classes/META-INF/MANIFEST.MF
+/target/classes/META-INF/maven/com.akg.data.perf/comparisons/pom.xml
+/target/classes/docker/postgresql/docker-compose.yaml
+/target/maven-archiver/pom.properties
+/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst
+/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst

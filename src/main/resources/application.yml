@@ -1,5 +1,5 @@
 spring:
-  profiles: 
+  profiles: # here is specified the actual DB that should be benchmarked
     active: elasticsearch # elasticsearch,mongodb,cassandra,postgres
  
 
@@ -9,12 +9,11 @@ logging:
     com.akg: INFO
 
 commons:
-  input-data-file: src/main/resources/winemag-data_first150k.csv
-  batch-size: 5000
-  frequency-output-in-ms: 10000
+  input-data-file: src/main/resources/winemag-data_first150k.csv # source file with the data
+  batch-size: 5000 # size of records that should be inserted on one pass
+  frequency-output-in-ms: 10000 # milliseconds time interval for printing the current result ( for example Inserted Records Per Second until that moment )
   use-cases:
-    # possible values are: one, crud
-    active-use-case: one
+    active-use-case: one # possible values are: one, crud
     # Execution type possible values: 
     #   what: elasticsearch, mongodb 
     #   mode: inserts, search, updates, deletes

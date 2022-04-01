@@ -12,10 +12,11 @@ elasticsearch:
                             "max_id": { "max": { "field": "id" } }
                           }
                }'
+  # list of com.akg.dbperfcheck.config.pojo.Query objects used for the READ operations
   search-queries:
     - {
-       name: findByCountry,
-       exec: '{
+       name: findByCountry, # name of the query
+       exec: '{ 
                 "size": 100,
                 "query": {
                            "bool": {
@@ -28,12 +29,12 @@ elasticsearch:
                                             ]
                                    }
                          }
-              }',
-       percentage: 15,
+              }', # actual query
+       percentage: 15, # this is the percentage of executions of this query among all executed queries
        params: [
                  {param1: Bulgaria},{param1: Romania},{param1: Greece},{param1: Macedonia},{param1: Turkey},{param1: Germany},{param1: France},{param1: Italy},{param1: Austria},{param1: Spain},{param1: Portugal},{param1: Argentina}
                ]
-      }
+      } # predefined parameter values, one of them randomly will be picked up and pass to the query above
     - {
        name: findByPoints,
        exec: '{
@@ -142,12 +143,13 @@ elasticsearch:
                                      }
                           }
                }',
-       percentage: 15,
+       percentage: 15, 
        params: []
       }
+  # list of com.akg.dbperfcheck.config.pojo.Query objects used for the UPDATE queries
   update-queries:
     - {
-        name: updatePointsByCountry,
+        name: updatePointsByCountry, # name of the query
         exec: '{
                  "script" : {
                  "source": "ctx._source.points = params.points",
@@ -156,11 +158,11 @@ elasticsearch:
                               "points" : 96
                             }
                  }
-        }',
-        percentage: 40,
+        }', # actual query
+        percentage: 40, # this is the percentage of executions of this query among all executed queries
         params: [
                   {param1: Bulgaria},{param1: Romania},{param1: Greece},{param1: Macedonia},{param1: Turkey},{param1: Germany},{param1: France},{param1: Italy},{param1: Austria},{param1: Spain},{param1: Portugal},{param1: Argentina}
-                ],
+                ], # predefined parameter values, one of them randomly will be picked up and pass to the query above
         additional-exec: '{
                 "size": 100,
                 "query": {
@@ -174,8 +176,8 @@ elasticsearch:
                                             ]
                                    }
                          }
-              }'
-      }
+              }' # this is an additional query used to help the process for the actual query in the current '' property
+      } # in this example the result from 'additional-exec' is pass to the actual update query in 'exec'
     - {
         name: updatePricesByCountry,
         exec: '{
@@ -187,7 +189,7 @@ elasticsearch:
                   }
                 }
         }',
-        percentage: 15,
+        percentage: 15, 
         params: [
                   {param1: Bulgaria},{param1: Romania},{param1: Greece},{param1: Macedonia},{param1: Turkey},{param1: Germany},{param1: France},{param1: Italy},{param1: Austria},{param1: Spain},{param1: Portugal},{param1: Argentina}
                 ],

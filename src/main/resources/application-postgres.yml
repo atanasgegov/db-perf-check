@@ -128,14 +128,14 @@ postgres:
                   {param1: Thracian Valley},{param1: Washington},{param1: Tuscany},{param1: Bordeaux},{param1: Northern Spain},{param1: Mendoza Province},{param1: Burgundy},{param1: Piedmont},{param1: Veneto}
                 ]
       }
-  delete-queries:
+  delete-queries: # list of com.akg.dbperfcheck.config.pojo.Query objects used for the DELETE queries
     - {
-       name: deleteByCountry,
+       name: deleteByCountry, # name of the query
        exec: 'delete from wines.wine
-              where country = ''?1''',
+              where country = ''?1''', # the actual query
        params: [
                  {param1: Italy},{param1: Slovenia},{param1: Serbia}
-               ]
+               ] # predefined parameter values, one of them randomly will be picked up and pass to the query above
       }
     - {
        name: deleteByPoints,
