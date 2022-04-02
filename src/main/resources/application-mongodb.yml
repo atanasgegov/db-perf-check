@@ -5,6 +5,7 @@ mongodb:
   pass: test
   database: wine
   collection: wines
+  # query that returns maximum ID of the table used for INSERT ( universal autoincrement logic implementation ).
   max-id-query: '{
                  aggregate: "wines",
                  pipeline: [
@@ -17,14 +18,14 @@ mongodb:
                  ],
                  cursor: {}
                }'
-  search-queries:
+  search-queries: # list of com.akg.dbperfcheck.config.pojo.Query objects used for the READ operations
     - {
-       name: findByCountry,
-       exec: '{ find: "wines", filter: { country: "?1" } }',
-       percentage: 15,
+       name: findByCountry, # name of the query
+       exec: '{ find: "wines", filter: { country: "?1" } }', # actual query
+       percentage: 15, # this is the percentage of executions of this query among all executed queries
        params: [
                  {param1: Bulgaria},{param1: Romania},{param1: Greece},{param1: Macedonia},{param1: Turkey},{param1: Germany},{param1: France},{param1: Italy},{param1: Austria},{param1: Spain},{param1: Portugal},{param1: Argentina}
-               ]
+               ] # predefined parameter values, one of them randomly will be picked up and pass to the query above
       }
     - {
        name: findByPoints,
@@ -106,7 +107,7 @@ mongodb:
       }
   update-queries: # list of com.akg.dbperfcheck.config.pojo.Query objects used for the UPDATE queries
     - {
-        name: updatePointsByCountry, # name of the qiery
+        name: updatePointsByCountry, # name of the query
         exec: '{  
                  update: "wines",  
                  updates: [  
@@ -185,16 +186,17 @@ mongodb:
                   {param1: Thracian Valley},{param1: Washington},{param1: Tuscany},{param1: Bordeaux},{param1: Northern Spain},{param1: Mendoza Province},{param1: Burgundy},{param1: Piedmont},{param1: Veneto}
                 ]
       }
+  # list of com.akg.dbperfcheck.config.pojo.Query objects used for the DELETE queries
   delete-queries:
     - {
-       name: deleteByCountry,
+       name: deleteByCountry, # name of the query
        exec: '{  
                 delete: "wines",  
                 deletes: [ { q: { country: "?1" }, limit: 0 } ]  
-              }',
+              }', # the actual query
        params: [
                  {param1: Austria},{param1: France},{param1: Spain}
-               ]
+               ] # predefined parameter values, one of them randomly will be picked up and pass to the query above
       }
     - {
        name: deleteByPoints,

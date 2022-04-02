@@ -4,15 +4,16 @@ cassandra:
   user: cassandra
   pass: cassandra
   datacenter: datacenter1
-  max-id-query: 'SELECT MAX(id) as id FROM wines.wine'
+  max-id-query: 'SELECT MAX(id) as id FROM wines.wine' # query that returns maximum ID of the table used for INSERT ( universal autoincrement logic implementation ).
+  # list of com.akg.dbperfcheck.config.pojo.Query objects used for the READ operations
   search-queries:
     - {
-       name: findByCountry,
-       exec: 'select * from wines.wine where country = ''?1'' ALLOW FILTERING',
-       percentage: 15,
+       name: findByCountry, # name of the query
+       exec: 'select * from wines.wine where country = ''?1'' ALLOW FILTERING', # actual query
+       percentage: 15, # this is the percentage of executions of this query among all executed queries
        params: [
                  {param1: Bulgaria},{param1: Romania},{param1: Greece},{param1: Macedonia},{param1: Turkey},{param1: Germany},{param1: France},{param1: Italy},{param1: Austria},{param1: Spain},{param1: Portugal},{param1: Argentina}
-               ]
+               ] # predefined parameter values, one of them randomly will be picked up and pass to the query above
       }
     - {
        name: findByPoints,
@@ -64,16 +65,18 @@ cassandra:
        percentage: 15,
        params: []
       }
-  update-queries:
+  update-queries: # list of com.akg.dbperfcheck.config.pojo.Query objects used for the UPDATE queries
     - {
-        name: updatePointsByCountry,
+        name: updatePointsByCountry, # name of the query
         exec: 'update wines.wine
                set points = 96
-               where id = ? IF EXISTS',
-        percentage: 40,
+               where id = ? IF EXISTS', # the actual query
+        percentage: 40, # this is the percentage of executions of this query among all executed queries
         params: [
                   {param1: Bulgaria},{param1: Romania},{param1: Greece},{param1: Macedonia},{param1: Turkey},{param1: Germany},{param1: France},{param1: Italy},{param1: Austria},{param1: Spain},{param1: Portugal},{param1: Argentina}
-                ],
+                ], # predefined parameter values, one of them randomly will be picked up and pass to the query above
+        # this is an additional query used to help the process for the actual query in the current '' property
+        # in this example the result from 'additional-exec' is pass to the actual update query in 'exec'
         additional-exec: 'select id from wines.wine where country = ''?1'' ALLOW FILTERING'
       }
     - {
@@ -120,14 +123,16 @@ cassandra:
                 ],
         additional-exec: 'select id from wines.wine where province = ''?1'' ALLOW FILTERING'
       }
-  delete-queries:
+  delete-queries: # list of com.akg.dbperfcheck.config.pojo.Query objects used for the DELETE queries
     - {
-       name: deleteByCountry,
+       name: deleteByCountry, # name of the query
        exec: 'delete from wines.wine
-               where id = ? IF EXISTS',
+               where id = ? IF EXISTS', # the actual query
        params: [
                  {param1: Italy},{param1: Slovenia},{param1: Serbia}
-               ],
+               ], # predefined parameter values, one of them randomly will be picked up and pass to the query above
+       # this is an additional query used to help the process for the actual query in the current '' property
+       # in this example the result from 'additional-exec' is pass to the actual update query in 'exec'
        additional-exec: 'select id from wines.wine where country = ''?1'' ALLOW FILTERING'
       }
     - {

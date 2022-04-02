@@ -1,7 +1,6 @@
 spring:
   profiles: # here is specified the actual DB that should be benchmarked
     active: elasticsearch # elasticsearch,mongodb,cassandra,postgres
- 
 
 logging:
   level:
