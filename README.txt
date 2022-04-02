@@ -1,4 +1,4 @@
-How to run the application:
+ How to run the application:
 
 1. Run via IDE
   1.1. Import Existing Maven Project -> comparisons
@@ -12,6 +12,6 @@ How to run the application:
   2.4. Run 
     $java -jar comparisons-0.0.1-SNAPSHOT.jar -Dspring.config.location=.
   
-2. Configurations
+Configurations
   - the main configuration is at application.yml
   - each DB has its own file for example for Elasticsearch the file is application-elasticsearch.yml  
