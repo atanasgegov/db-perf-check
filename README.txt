@@ -1,4 +1,4 @@
- How to run the application:
+ *How to run the application:*
 
 1. Run via IDE
   Just run java class as Java Application -> com.akg.dbperfcheck.DBPerfCheckApplication.java
