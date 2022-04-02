@@ -4,11 +4,11 @@
   Just run java class as Java Application -> **com.akg.dbperfcheck.DBPerfCheckApplication.java**
 
 - Build with maven and Run the jar file.<br/>
-  1.Go to the project home directory and run<br/><br/>
+  1.&nbsp;Go to the project home directory and run<br/>
   	&nbsp;&nbsp;**mvn clean install**<br/>
-  2.Copy/Paste dbperfcheck-0.0.1-SNAPSHOT.jar and src/main/resources directory where you want, for example let be directory TEST.<br/>
-  3.Go to TEST directory open application.yaml file and set the proper values for the properties ( input-data-file, use-cases, etc.<br/>
-  4.Run.<br/><br/>
+  2.&nbsp;Copy/Paste dbperfcheck-0.0.1-SNAPSHOT.jar and src/main/resources directory where you want, for example let be directory TEST.<br/>
+  3.&nbsp;Go to TEST directory open application.yaml file and set the proper values for the properties ( input-data-file, use-cases, etc.<br/>
+  4.&nbsp;Run.<br/>
     &nbsp;&nbsp;**java -jar dbperfcheck-0.0.1-SNAPSHOT.jar -Dspring.config.location=.**<br/>
 
 
