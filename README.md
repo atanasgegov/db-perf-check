@@ -3,12 +3,12 @@
 1. Run via IDE
   Just run java class as Java Application -> **com.akg.dbperfcheck.DBPerfCheckApplication.java**
 
-2. Build with maven and Run the jar file.
-  - Go to the project home directory and run 
+2. Build with maven and Run the jar file.<br/>
+  2.1. Go to the project home directory and run 
   	**$mvn clean install**
   - Copy/Paste dbperfcheck-0.0.1-SNAPSHOT.jar and src/main/resources directory where you want, for example let be directory TEST.
   - Go to TEST directory open application.yaml file and set the proper values for the properties ( input-data-file, use-cases, etc.
-  - Run.
+  - Run.<br />
     **$java -jar dbperfcheck-0.0.1-SNAPSHOT.jar -Dspring.config.location=.**
 
 
