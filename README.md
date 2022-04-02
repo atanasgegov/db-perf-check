@@ -1,5 +1,4 @@
 **How to run the application:**
-
 - Run via IDE
   Just run java class as Java Application -> **com.akg.dbperfcheck.DBPerfCheckApplication.java**
 
@@ -19,7 +18,7 @@
   - When the particular docker container is run it has to be run commands that are important for proper setup, for example, the creation of the tables, indexes, etc.
 
 
-**How to integrate new DB to the project.**
+**How to integrate new DB to the project.**<br/>
   The following steps should be executed.
   - [Required] -> Create com.akg.dbperfcheck.config.{DBNAME}Config.java ( example ElasitcsearchConfig.java )
   - [Required] -> Create com.akg.dbperfcheck.service.{DBNAME}Command.java ( example ElasitcsearchCommand.java )
