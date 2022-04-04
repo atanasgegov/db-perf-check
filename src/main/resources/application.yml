@@ -1,24 +1,30 @@
 spring:
-  profiles: # here is specified the actual DB that should be benchmarked
-    active: elasticsearch # elasticsearch,mongodb,cassandra,postgres
+  profiles: # here is specified the actual DB that will be benchmarked
+    active: postgres # possible values are: elasticsearch, mongodb, cassandra, postgres
 
+# the logging configuration is here
 logging:
   level:
     root: INFO
     com.akg: INFO
 
 commons:
+  # The 'active-use-case' is very important property - which one com.akg.dbperf check.config.pojo.Execution the application will run. The exact definition can be found a bit below at property 'use-cases'. 
+  active-use-case: one # possible values are: one, crud
   input-data-file: src/main/resources/winemag-data_first150k.csv # source file with the data
   batch-size: 5000 # size of records that should be inserted on one pass
   frequency-output-in-ms: 10000 # milliseconds time interval for printing the current result ( for example Inserted Records Per Second until that moment )
+  # Definition of the use cases that the application can run. Which one will be run check above property 'active-use-case'.
+  # The possible variants are: 
+  #   one - it will be run only one com.akg.dbperfcheck.config.pojo.Execution ( one among 'inserts', 'search', 'updates', 'deletes' )
+  #   crud - it will be run 4 one com.akg.dbperfcheck.config.pojo.Execution ( CRUD )
   use-cases:
-    active-use-case: one # possible values are: one, crud
     # Execution type possible values: 
-    #   what: elasticsearch, mongodb 
+    #   what: elasticsearch, mongodb, cassandra, postgres
     #   mode: inserts, search, updates, deletes
-    one: {what: elasticsearch, mode: inserts, time-in-ms: 10000}  
+    one: {what: '${spring.profiles.active}', mode: search, time-in-ms: 60000}  
     crud:
-      - {what: elasticsearch, mode: inserts, time-in-ms: 10000} 
-      - {what: elasticsearch, mode: search, time-in-ms: 10000} 
-      - {what: elasticsearch, mode: updates, time-in-ms: 10000}
-      - {what: elasticsearch, mode: deletes, time-in-ms: 10000}
+      - {what: '${spring.profiles.active}', mode: inserts, time-in-ms: 10000} 
+      - {what: '${spring.profiles.active}', mode: search, time-in-ms: 10000} 
+      - {what: '${spring.profiles.active}', mode: updates, time-in-ms: 10000}
+      - {what: '${spring.profiles.active}', mode: deletes, time-in-ms: 10000}

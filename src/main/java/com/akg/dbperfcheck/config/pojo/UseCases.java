@@ -7,7 +7,6 @@ import lombok.Data;
 @Data
 public class UseCases {
 
-	private Type activeUseCase = Type.ONE;
 	private Execution one;
 	private List<Execution> crud;
 	

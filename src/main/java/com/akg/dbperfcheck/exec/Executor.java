@@ -41,16 +41,16 @@ public class Executor {
 	public void exec() {
 
 	    long start = System.currentTimeMillis();
-		if( commonConfig.getUseCases().getActiveUseCase().equals( UseCases.Type.ONE ) ) {
+		if( commonConfig.getActiveUseCase().equals( UseCases.Type.ONE ) ) {
 
 			this.run( commonConfig.getUseCases().getOne() );
-		} else if( commonConfig.getUseCases().getActiveUseCase().equals( UseCases.Type.CRUD ) ) {
+		} else if( commonConfig.getActiveUseCase().equals( UseCases.Type.CRUD ) ) {
 
 			for(Execution execution : commonConfig.getUseCases().getCrud()) {
 				this.run(execution);
 			}
 		} else {
-			log.warn("Please, check your configuration, probably the wrong value was set for active-use-case: {}", commonConfig.getUseCases().getActiveUseCase());		
+			log.warn("Please, check your configuration, probably the wrong value was set for active-use-case: {}", commonConfig.getActiveUseCase());		
 		}
 
 		long end = System.currentTimeMillis();
