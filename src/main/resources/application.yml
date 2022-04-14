@@ -1,6 +1,6 @@
 spring:
   profiles: # here is specified the actual DB that will be benchmarked
-    active: ksqldb # possible values are: elasticsearch, mongodb, cassandra, postgres, ksqldb
+    active: elasticsearch # possible values are: elasticsearch, mongodb, cassandra, postgres, ksqldb
 
 # the logging configuration is here
 logging:
@@ -22,7 +22,7 @@ commons:
     # Execution type possible values: 
     #   what: elasticsearch, mongodb, cassandra, postgres, ksqldb
     #   mode: inserts, search, updates, deletes
-    one: {what: '${spring.profiles.active}', mode: inserts, time-in-ms: 3600000}  
+    one: {what: '${spring.profiles.active}', mode: search, time-in-ms: 60000}  
     crud:
       - {what: '${spring.profiles.active}', mode: inserts, time-in-ms: 10000} 
       - {what: '${spring.profiles.active}', mode: search, time-in-ms: 10000} 
