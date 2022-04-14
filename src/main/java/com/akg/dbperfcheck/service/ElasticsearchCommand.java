@@ -101,7 +101,7 @@ public class ElasticsearchCommand extends AbstractCommand {
 	protected Long getMaxId() {
 		try {
 			Request request = new Request("POST", esConfig.getEndPoint().getSearch());
-			request.setJsonEntity( esConfig.getMaxIdQuery() );
+			request.setJsonEntity( esConfig.getMaxIdQuery().getExec() );
 			Response response = restClient.performRequest(request);
 			if (response != null && response.getStatusLine().getStatusCode() < 300) {
 				String responseBody = EntityUtils.toString(response.getEntity());

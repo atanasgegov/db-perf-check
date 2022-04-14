@@ -13,7 +13,7 @@ public abstract class AbstractConfig {
 	protected int port;
 	protected String user;
 	protected String pass;
-	protected String maxIdQuery;
+	protected Query maxIdQuery;
 	protected List<Query> searchQueries;
 	protected List<Query> updateQueries;
 	protected List<Query> deleteQueries;

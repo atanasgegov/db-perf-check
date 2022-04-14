@@ -62,7 +62,7 @@ public class CassandraCommand extends AbstractCommand {
 	@Override
 	protected Long getMaxId() {
 
-		ResultSet rs = cqlSession.execute(cassandraConfig.getMaxIdQuery());
+		ResultSet rs = cqlSession.execute(cassandraConfig.getMaxIdQuery().getExec());
 		Row row = rs.one();
 		Long maxId = 0L;
 		try {

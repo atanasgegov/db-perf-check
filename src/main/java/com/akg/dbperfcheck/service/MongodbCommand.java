@@ -87,7 +87,7 @@ public class MongodbCommand extends AbstractCommand {
 	
 	@Override
 	protected Long getMaxId() {
-		Bson bsonCmd = Document.parse(mongodbConfig.getMaxIdQuery());
+		Bson bsonCmd = Document.parse(mongodbConfig.getMaxIdQuery().getExec());
 
 		// Execute the native query
 		Document result = db.runCommand(bsonCmd);

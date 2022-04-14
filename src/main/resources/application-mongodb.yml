@@ -6,18 +6,21 @@ mongodb:
   database: wine
   collection: wines
   # query that returns maximum ID of the table used for INSERT ( universal autoincrement logic implementation ).
-  max-id-query: '{
-                 aggregate: "wines",
-                 pipeline: [
-                 { 
-                   $group : { 
-                    _id: null, 
-                    max: { $max : "$id" }
-                   },
-                 }
-                 ],
-                 cursor: {}
-               }'
+  max-id-query: {
+    name: maxIdQuery,
+    exec: '{
+             aggregate: "wines",
+             pipeline: [
+               { 
+                 $group : { 
+                     _id: null, 
+                      max: { $max : "$id" }
+                 },
+               }
+             ],
+             cursor: {}
+           }'
+  }
   search-queries: # list of com.akg.dbperfcheck.config.pojo.Query objects used for the READ operations
     - {
        name: findByCountry, # name of the query

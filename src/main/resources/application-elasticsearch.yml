@@ -7,12 +7,15 @@ elasticsearch:
   end-point: { search: /wine/_search, insert: /wine/_bulk, update: /wine/_update/, delete: /wine/_delete_by_query }
   io-thread-count: 1
   # query that returns maximum ID of the table used for INSERT ( universal autoincrement logic implementation )
-  max-id-query: '{ 
-                  "size": 0,
-                  "aggs": {
-                            "max_id": { "max": { "field": "id" } }
-                          }
-               }' 
+  max-id-query: {
+    name: maxIdQuery,
+    exec: '{ 
+             "size": 0,
+             "aggs": {
+                       "max_id": { "max": { "field": "id" } }
+                     }
+           }'
+  }
   # list of com.akg.dbperfcheck.config.pojo.Query objects used for the READ operations
   search-queries:
     - {

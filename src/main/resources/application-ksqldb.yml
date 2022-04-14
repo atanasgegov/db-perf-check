@@ -1,32 +1,35 @@
-postgres:
+ksqldb:
   host: localhost
-  port: 5432
-  url: jdbc:postgresql://localhost:5432/postgres
-  user: root
-  pass: root
-  # query that returns maximum ID of the table used for INSERT ( universal autoincrement logic implementation ).
+  port: 8088
+  # query that returns maximum ID of the table used for INSERT ( universal autoincrement logic implementation )
   max-id-query: {
     name: maxIdQuery,
-    exec: 'select max(id)
-             from wines.wine'
+    exec: 'select num_of_rows from s_wines_counter;',
+    additional-exec: 'CREATE TABLE s_wines_counter 
+                      WITH (partitions = 1) AS
+                      SELECT   1 as k,
+                               COUNT(1) AS num_of_rows
+                       FROM    s_wines
+                      GROUP BY 1;'
+  }
+  # clean query used to clean or drop records or tables/streams/collections/objects, etc.
+  clean-query: {
+    name: maxIdQueryTableDrop,
+    exec: 'drop table s_wines_counter;'
   }
   # list of com.akg.dbperfcheck.config.pojo.Query objects used for the READ operations
   search-queries:
     - {
        name: findByCountry, # name of the query
-       exec: 'select *
-              from wines.wine
-              where country = ''?1''', # actual query
+       exec: 'select * from s_wines where country = ''?1'' limit 10;', # actual query
        percentage: 15, # this is the percentage of executions of this query among all executed queries
        params: [
                  {param1: Bulgaria},{param1: Romania},{param1: Greece},{param1: Macedonia},{param1: Turkey},{param1: Germany},{param1: France},{param1: Italy},{param1: Austria},{param1: Spain},{param1: Portugal},{param1: Argentina}
-               ] # predefined parameter values, one of them randomly will be picked up and pass to the query above
-      }
+               ]
+      } # predefined parameter values, one of them randomly will be picked up and pass to the query above
     - {
        name: findByPoints,
-       exec: 'select *
-              from wines.wine
-              where points = ?1',
+       exec: 'select * from s_wines where points = ?1 limit 10;',
        percentage: 15,
        params: [
                  {param1: 91},{param1: 92},{param1: 93},{param1: 94},{param1: 95},{param1: 96},{param1: 97},{param1: 98},{param1: 99},{param1: 100}
@@ -34,9 +37,7 @@ postgres:
       }
     - {
        name: findByPrice,
-       exec: 'select *
-              from wines.wine
-              where price = ?1',
+       exec: 'select * from s_wines where price = ?1 limit 10;',
        percentage: 15,
        params: [
                  {param1: 90},{param1: 91},{param1: 92},{param1: 93},{param1: 94},{param1: 95},{param1: 96},{param1: 97},{param1: 98},{param1: 99},{param1: 100},{param1: 200},{param1: 500},{param1: 1000},{param1: 2000}
@@ -44,10 +45,7 @@ postgres:
       }
     - {
        name: findByCountryAndPoints,
-       exec: 'select *
-              from wines.wine
-              where country = ''?1'' and
-                    points = ?2',
+       exec: 'select * from s_wines where country = ''?1'' and points = ?2 limit 10;',
        percentage: 25,
        params: [
                  {param1: Bulgaria, param2: 96},{param1: Bulgaria, param2: 97},{param1: Bulgaria, param2: 98},{param1: Bulgaria, param2: 99},{param1: Bulgaria, param2: 100},
@@ -69,26 +67,21 @@ postgres:
       }
     - {
         name: findAggregations,
-        exec: 'select min(price), max(price), avg(price), count(*)
-               from wines.wine',
+        exec: 'select country, min(price), max(price), avg(price) from s_wines group by country limit 10;',
        percentage: 15,
        params: []
       }
     - {
         name: findCountAndGroupByCountry,
-        exec: 'select country, count(*)
-               from wines.wine
-               group by country',
-       percentage: 15,
+        exec: 'select country, count(*) from s_wines group by country limit 10;',
+       percentage: 15, 
        params: []
       }
   # list of com.akg.dbperfcheck.config.pojo.Query objects used for the UPDATE queries
   update-queries:
     - {
         name: updatePointsByCountry, # name of the query
-        exec: 'update wines.wine
-               set points = 96
-               where country = ''?1''', # actual query
+        exec: 'not implemented!', # actual query
         percentage: 40, # this is the percentage of executions of this query among all executed queries
         params: [
                   {param1: Bulgaria},{param1: Romania},{param1: Greece},{param1: Macedonia},{param1: Turkey},{param1: Germany},{param1: France},{param1: Italy},{param1: Austria},{param1: Spain},{param1: Portugal},{param1: Argentina}
@@ -96,19 +89,15 @@ postgres:
       }
     - {
         name: updatePricesByCountry,
-        exec: 'update wines.wine
-               set points = 10
-               where country = ''?1''',
-        percentage: 15,
+        exec: 'not implemented!',
+        percentage: 15, 
         params: [
                   {param1: Bulgaria},{param1: Romania},{param1: Greece},{param1: Macedonia},{param1: Turkey},{param1: Germany},{param1: France},{param1: Italy},{param1: Austria},{param1: Spain},{param1: Portugal},{param1: Argentina}
                 ]
       }
     - {
         name: updatePointsByVariety,
-        exec: 'update wines.wine
-               set points = 96
-               where variety = ''?1''',
+        exec: 'not implemented!',
         percentage: 15,
         params: [
                   {param1: Mavrud},{param1: Ruen},{param1: Cabernet Sauvignon},{param1: Red Blend},{param1: Bordeaux-style Red Blend},{param1: Sauvignon Blanc},{param1: Syrah},{param1: Riesling},{param1: Merlot},{param1: Zinfandel}
@@ -116,9 +105,7 @@ postgres:
       }
     - {
         name: updatePricesByVariety,
-        exec: 'update wines.wine
-               set points = 11
-               where variety = ''?1''',
+        exec: 'not implemented!',
         percentage: 15,
         params: [
                   {param1: Mavrud},{param1: Ruen},{param1: Cabernet Sauvignon},{param1: Red Blend},{param1: Bordeaux-style Red Blend},{param1: Sauvignon Blanc},{param1: Syrah},{param1: Riesling},{param1: Merlot},{param1: Zinfandel}
@@ -126,35 +113,31 @@ postgres:
       }  
     - {
         name: updatePricesByProvince ,
-        exec: 'update wines.wine
-               set price = 15
-               where province = ''?1''',
+        exec: 'not implemented!',
         percentage: 15,
         params: [
                   {param1: Thracian Valley},{param1: Washington},{param1: Tuscany},{param1: Bordeaux},{param1: Northern Spain},{param1: Mendoza Province},{param1: Burgundy},{param1: Piedmont},{param1: Veneto}
                 ]
       }
-  delete-queries: # list of com.akg.dbperfcheck.config.pojo.Query objects used for the DELETE queries
+  # list of com.akg.dbperfcheck.config.pojo.Query objects used for the DELETE queries
+  delete-queries:
     - {
        name: deleteByCountry, # name of the query
-       exec: 'delete from wines.wine
-              where country = ''?1''', # the actual query
+       exec: 'not implemented!', # the actual query
        params: [
                  {param1: Italy},{param1: Slovenia},{param1: Serbia}
                ] # predefined parameter values, one of them randomly will be picked up and pass to the query above
       }
     - {
        name: deleteByPoints,
-       exec: 'delete from wines.wine
-              where points = ?1',
+       exec: 'not implemented!',
        params: [
                  {param1: 84},{param1: 85},{param1: 86}
                ]
       }
     - {
        name: deleteByPrice,
-       exec: 'delete from wines.wine
-              where price = ?1',
+       exec: 'not implemented!',
        params: [
                  {param1: 15},{param1: 16},{param1: 17}
                ]

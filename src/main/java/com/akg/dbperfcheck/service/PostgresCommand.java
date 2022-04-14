@@ -102,7 +102,7 @@ public class PostgresCommand extends AbstractCommand {
 
 	@Override
 	protected Long getMaxId() {
-		try( PreparedStatement ps = conn.prepareStatement(postgresConfig.getMaxIdQuery()) ) {
+		try( PreparedStatement ps = conn.prepareStatement(postgresConfig.getMaxIdQuery().getExec()) ) {
 			ResultSet rs = ps.executeQuery();
 			Long maxId = 0L;
 			while(rs.next()) {

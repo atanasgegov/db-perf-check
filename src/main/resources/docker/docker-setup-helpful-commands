@@ -88,3 +88,30 @@ CREATE TABLE wines.wine(
 create index idx_wine_country_points on wines.wine(country,points);
 
 create index idx_wine_price on wines.wine(price);
+
+########
+# ksqldb
+########
+docker exec -it ksqldb-cli ksql http://ksqldb-server:8088
+
+SET 'auto.offset.reset' = 'earliest';
+
+CREATE STREAM s_wines (
+  id bigint key,
+  num int,
+  country VARCHAR,
+  description VARCHAR,
+  designation VARCHAR,
+  points int,
+  price double,
+  province VARCHAR,
+  region1 VARCHAR,
+  region2 VARCHAR,
+  variety VARCHAR,
+  winery VARCHAR
+) WITH (
+    kafka_topic = 'wines',
+    partitions = 1,
+    value_format = 'DELIMITED'
+);
+

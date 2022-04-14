@@ -1,6 +1,6 @@
 spring:
   profiles: # here is specified the actual DB that will be benchmarked
-    active: postgres # possible values are: elasticsearch, mongodb, cassandra, postgres
+    active: ksqldb # possible values are: elasticsearch, mongodb, cassandra, postgres, ksqldb
 
 # the logging configuration is here
 logging:
@@ -20,9 +20,9 @@ commons:
   #   crud - it will be run 4 one com.akg.dbperfcheck.config.pojo.Execution ( CRUD )
   use-cases:
     # Execution type possible values: 
-    #   what: elasticsearch, mongodb, cassandra, postgres
+    #   what: elasticsearch, mongodb, cassandra, postgres, ksqldb
     #   mode: inserts, search, updates, deletes
-    one: {what: '${spring.profiles.active}', mode: search, time-in-ms: 10000}  
+    one: {what: '${spring.profiles.active}', mode: inserts, time-in-ms: 3600000}  
     crud:
       - {what: '${spring.profiles.active}', mode: inserts, time-in-ms: 10000} 
       - {what: '${spring.profiles.active}', mode: search, time-in-ms: 10000} 
