@@ -6,112 +6,164 @@
 ###############
 # elasticsearch
 ###############
-open powershell
+# start powershell on windows
+$	open powershell
+
+# start docker-desktop on wsl
 wsl -d docker-desktop
+
+# changed a vm.max_map_count value in order to fix ES error bootstrap checks failed
 sysctl -w vm.max_map_count=262144
+
+#################################
 
 #########
 # mongodb
 #########
-mongo -u root -p example
-use wine;
-db.createUser({user:"test",pwd:"test",roles:["readWrite","dbAdmin"]});
-db.createCollection('wines');
-show collections;
-db.wines.createIndex( {country : 1} );
-db.wines.createIndex( {points : 1} );
-db.wines.createIndex( {price : 1} );
-db.wines.createIndex( {country : 1, points: 1} );
+# login to mongoDB
+$	mongo -u root -p example
+
+# switch to wine database
+$	use wine;
+
+# create a user
+$	db.createUser({user:"test",pwd:"test",roles:["readWrite","dbAdmin"]});
+
+# create a collection
+$	db.createCollection('wines');
+
+# create indeces
+$	db.wines.createIndex( {country : 1} );
+$	db.wines.createIndex( {points : 1} );
+$	db.wines.createIndex( {price : 1} );
+$	db.wines.createIndex( {country : 1, points: 1} );
+
+# show available collections
+$	show collections;
+
 # get all indexes for wines collection
-db.wines.getIndexes();
+$	db.wines.getIndexes();
+
 # get max Id
-db.wines.find().sort({id:-1}).limit(1);
+$	db.wines.find().sort({id:-1}).limit(1);
+
+###########################################
 
 ###########
 # cassandra
 ###########
-docker exec -it cassandra_container bash
-cqlsh -u cassandra -p cassandra
+# run bash on cassandra container
+$	docker exec -it cassandra_container bash
+# start cqlsh tool
+$	cqlsh -u cassandra -p cassandra
 
-CREATE KEYSPACE wines
-  WITH REPLICATION = { 
-   'class' : 'SimpleStrategy', 
-   'replication_factor' : 1 
-  };
-  
-CREATE KEYSPACE IF NOT EXISTS wines WITH replication={'class':'NetworkTopologyStrategy', 'datacenter1': '1'};
+# create a keyspace  
+$	CREATE KEYSPACE IF NOT EXISTS wines WITH replication={'class':'NetworkTopologyStrategy', 'datacenter1': '1'};
 
-CREATE TABLE wines.wine(
-  id bigint,
-  num int,
-  country varchar,
-  description varchar,
-  designation varchar,
-  points int,
-  price float,
-  province varchar,
-  region1 varchar,
-  region2 varchar,
-  variety varchar,
-  winery varchar,
-  PRIMARY KEY (id)
-);
+# create a table
+$	CREATE TABLE wines.wine(
+	  id bigint,
+	  num int,
+	  country varchar,
+	  description varchar,
+	  designation varchar,
+	  points int,
+	  price float,
+	  province varchar,
+	  region1 varchar,
+	  region2 varchar,
+	  variety varchar,
+	  winery varchar,
+	  PRIMARY KEY (id)
+	);
 
-describe keyspaces;
-describe tables;
-
-select * from wines.wine;
+# some helping commands
+$	describe keyspaces;
+$	describe tables;
+$	select * from wines.wine;
+#############################
 
 ############
 # postgresql
 ############
 # Firstly, connect with your favorite DB tool to the postgres database with user: root and password: root  
-    
-create schema wines;
 
-CREATE TABLE wines.wine(
-  id SERIAL,
-  num integer,
-  country text,
-  description text,
-  designation text,
-  points int,
-  price double precision,
-  province text,
-  region1 text,
-  region2 text,
-  variety text,
-  winery text,
-  PRIMARY KEY (id)
-);
+# create a DB schema
+$	create schema wines;
 
-create index idx_wine_country_points on wines.wine(country,points);
+# create a table
+$	CREATE TABLE wines.wine(
+	  id SERIAL,
+	  num integer,
+	  country text,
+	  description text,
+	  designation text,
+	  points int,
+	  price double precision,
+	  province text,
+	  region1 text,
+	  region2 text,
+	  variety text,
+	  winery text,
+	  PRIMARY KEY (id)
+	);
 
-create index idx_wine_price on wines.wine(price);
+# create a index
+$	create index idx_wine_country_points on wines.wine(country,points);
+
+# create another index
+$	create index idx_wine_price on wines.wine(price);
+
+#####################################################
 
 ########
 # ksqldb
 ########
-docker exec -it ksqldb-cli ksql http://ksqldb-server:8088
+# start ksqldb-cli tool
+$	docker exec -it ksqldb-cli ksql http://ksqldb-server:8088
 
-SET 'auto.offset.reset' = 'earliest';
+# It tells ksqlDB to start all queries from the earliest point in each topic:
+$	SET 'auto.offset.reset' = 'earliest';
 
-CREATE STREAM s_wines (
-  id bigint key,
-  num int,
-  country VARCHAR,
-  description VARCHAR,
-  designation VARCHAR,
-  points int,
-  price double,
-  province VARCHAR,
-  region1 VARCHAR,
-  region2 VARCHAR,
-  variety VARCHAR,
-  winery VARCHAR
-) WITH (
-    kafka_topic = 'wines',
-    partitions = 1,
-    value_format = 'DELIMITED'
-);
+# create a stream
+$	CREATE STREAM s_wines (
+	  id bigint key,
+	  num int,
+	  country VARCHAR,
+	  description VARCHAR,
+	  designation VARCHAR,
+	  points int,
+	  price double,
+	  province VARCHAR,
+	  region1 VARCHAR,
+	  region2 VARCHAR,
+	  variety VARCHAR,
+	  winery VARCHAR
+	) WITH (
+		kafka_topic = 'wines',
+		partitions = 1,
+		value_format = 'DELIMITED'
+	);
+##################################
 
+#######
+# redis
+#######
+# start redis-cli tool
+$	docker-compose run redisearch redis-cli -h redisearch
+
+# add test data
+$	HSET wine:0 num 0 country "Test" description "test" designation "test" points 0 price 0.0 province "test" region1 "test" region2 "test" variety "test" winery "test"
+$	HSET wine:-1 num 0 country "Test -1" description "test -1" designation "test -1" points 0 price 0.0 province "test -1" region1 "test -1" region2 "test -1" variety "test -1" winery "test -1"
+$	HSET wine:-2 num 0 country "Test -2" description "test -2" designation "test -2" points 0 price 0.0 province "test -2" region1 "test -2" region2 "test -2" variety "test -2" winery "test -2"
+$	HSET wine:-3 num 0 country "Test -3" description "test -3" designation "test -3" points 0 price 0.0 province "test -3" region1 "test -3" region2 "test -3" variety "test -3" winery "test -3"
+$	HSET wine:-4 num 0 country "Test -4" description "test -4" designation "test -4" points 0 price 0.0 province "test -4" region1 "test -4" region2 "test -4" variety "test -4" winery "test -4"
+
+# show all keys
+$	keys wine*
+
+# create the index
+$	FT.CREATE idx:wine on hash prefix 1 "wine:" SCHEMA country TEXT SORTABLE points NUMERIC sortable price NUMERIC sortable 
+
+# index information
+$	FT.INFO idx:wine
