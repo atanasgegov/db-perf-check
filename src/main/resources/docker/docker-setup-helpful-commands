@@ -33,10 +33,10 @@ $	db.createUser({user:"test",pwd:"test",roles:["readWrite","dbAdmin"]});
 $	db.createCollection('wines');
 
 # create indeces
-$	db.wines.createIndex( {country :} );
-$	db.wines.createIndex( {points :} );
-$	db.wines.createIndex( {price :} );
-$	db.wines.createIndex( {country :, points:} );
+$	db.wines.createIndex( {country : 1} );
+$	db.wines.createIndex( {points : 1} );
+$	db.wines.createIndex( {price : 1} );
+$	db.wines.createIndex( {country :, points: 1} );
 
 # show available collections
 $	show collections;
@@ -141,7 +141,7 @@ $	CREATE STREAM s_wines (
 	  winery VARCHAR
 	) WITH (
 		kafka_topic = 'wines',
-		partitions =,
+		partitions = 1,
 		value_format = 'DELIMITED'
 	);
 ##################################
@@ -182,7 +182,7 @@ $	FT.SEARCH idx:wine "@country:Bulgaria  @points:[100]"
 $	HSET wine:-1 country "Test"
 
 # delete a key -2 in a second
-$	EXPIRE wine:-2
+$	EXPIRE wine:-2 1
 # delete keys -4 and -5
 $	del wine:-4 wine:-5
 
@@ -191,4 +191,4 @@ $	FT.SEARCH idx:wine @country:{test} LIMIT 0 0
 
 # an example with many aggregation functions just in a query
 $	FT.AGGREGATE idx:wine * GROUPBY 1 @flag REDUCE MIN 1 price as min_price REDUCE MAX 1 price as max_price REDUCE AVG 1 price as avg_price
-
+###########################################################################################################################################
