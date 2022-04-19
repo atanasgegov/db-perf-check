@@ -33,10 +33,10 @@ $	db.createUser({user:"test",pwd:"test",roles:["readWrite","dbAdmin"]});
 $	db.createCollection('wines');
 
 # create indeces
-$	db.wines.createIndex( {country : 1} );
-$	db.wines.createIndex( {points : 1} );
-$	db.wines.createIndex( {price : 1} );
-$	db.wines.createIndex( {country : 1, points: 1} );
+$	db.wines.createIndex( {country :} );
+$	db.wines.createIndex( {points :} );
+$	db.wines.createIndex( {price :} );
+$	db.wines.createIndex( {country :, points:} );
 
 # show available collections
 $	show collections;
@@ -141,7 +141,7 @@ $	CREATE STREAM s_wines (
 	  winery VARCHAR
 	) WITH (
 		kafka_topic = 'wines',
-		partitions = 1,
+		partitions =,
 		value_format = 'DELIMITED'
 	);
 ##################################
@@ -153,17 +153,42 @@ $	CREATE STREAM s_wines (
 $	docker-compose run redisearch redis-cli -h redisearch
 
 # add test data
-$	HSET wine:0 num 0 country "Test" description "test" designation "test" points 0 price 0.0 province "test" region1 "test" region2 "test" variety "test" winery "test"
-$	HSET wine:-1 num 0 country "Test -1" description "test -1" designation "test -1" points 0 price 0.0 province "test -1" region1 "test -1" region2 "test -1" variety "test -1" winery "test -1"
-$	HSET wine:-2 num 0 country "Test -2" description "test -2" designation "test -2" points 0 price 0.0 province "test -2" region1 "test -2" region2 "test -2" variety "test -2" winery "test -2"
-$	HSET wine:-3 num 0 country "Test -3" description "test -3" designation "test -3" points 0 price 0.0 province "test -3" region1 "test -3" region2 "test -3" variety "test -3" winery "test -3"
-$	HSET wine:-4 num 0 country "Test -4" description "test -4" designation "test -4" points 0 price 0.0 province "test -4" region1 "test -4" region2 "test -4" variety "test -4" winery "test -4"
+$	HSET wine:0 num 0 country "Test" description "test" designation "test" points 0 price 0.0 province "test" region1 "test" region2 "test" variety "test" winery "test" flag 0
+	HSET wine:-1 num -1 country "test2" description "test" designation "test" points 0 price 0.0 province "test" region1 "test" region2 "test" variety "test" winery "test" flag 0
+	HSET wine:-2 num -2 country "test2" description "test" designation "test" points 0 price 0.0 province "test" region1 "test" region2 "test" variety "test" winery "test" flag 0
+	HSET wine:-3 num -3 country "test" description "test" designation "test" points 0 price 0.0 province "test" region1 "test" region2 "test" variety "test" winery "test" flag 0
+	HSET wine:-4 num -4 country "test" description "test" designation "test" points 0 price 0.0 province "test" region1 "test" region2 "test" variety "test" winery "test" flag 0
+    HSET wine:-5 num -5 country "Test" description "test" designation "test" points -1 price -1.0 province "test" region1 "test" region2 "test" variety "test" winery "test" flag 0
 
 # show all keys
 $	keys wine*
 
 # create the index
-$	FT.CREATE idx:wine on hash prefix 1 "wine:" SCHEMA country TEXT SORTABLE points NUMERIC sortable price NUMERIC sortable 
+$	FT.CREATE idx:wine on hash prefix 1 "wine:" SCHEMA flag NUMERIC country TAG CASESENSITIVE points NUMERIC sortable price NUMERIC sortable 
+    
 
 # index information
 $	FT.INFO idx:wine
+
+# search by a field
+$	FT.SEARCH idx:wine "Bulgaria"
+$	FT.SEARCH idx:wine * FILTER points 0 0
+$	FT.SEARCH idx:wine "@country:{Bulgaria}"
+
+# search by two fields
+$	FT.SEARCH idx:wine "@country:Bulgaria  @points:[100]"
+
+# update one field
+$	HSET wine:-1 country "Test"
+
+# delete a key -2 in a second
+$	EXPIRE wine:-2
+# delete keys -4 and -5
+$	del wine:-4 wine:-5
+
+# count by field
+$	FT.SEARCH idx:wine @country:{test} LIMIT 0 0
+
+# an example with many aggregation functions just in a query
+$	FT.AGGREGATE idx:wine * GROUPBY 1 @flag REDUCE MIN 1 price as min_price REDUCE MAX 1 price as max_price REDUCE AVG 1 price as avg_price
+
