@@ -25,6 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Executor {
 	
+	private static final String PREFIX_BEAN_CONFIG = "Config";
+	private static final String PREFIX_BEAN_COMMAND = "Command";
+	
 	@Autowired
 	private CommonConfig commonConfig;
 	
@@ -64,8 +67,8 @@ public class Executor {
 
 		String what = execution.getWhat();
 		String mode = execution.getMode();
-		AbstractConfig config = beanFactory.getBean( what+"Config", AbstractConfig.class );
-		AbstractCommand command = beanFactory.getBean(what+"Commander", AbstractCommand.class);
+		AbstractConfig config = beanFactory.getBean( what+PREFIX_BEAN_CONFIG, AbstractConfig.class );
+		AbstractCommand command = beanFactory.getBean(what+PREFIX_BEAN_COMMAND, AbstractCommand.class);
 
 		log.info( "Executing '{}' '{}' queries for {} ms ...", what, mode, execution.getTimeInMs() );
 		if( mode.equals( AbstractConfig.ExecutionMode.SEARCH.getValue() ) ) {

@@ -20,7 +20,7 @@ import com.akg.dbperfcheck.util.QueryUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Service("postgresCommander")
+@Service("postgresCommand")
 @Slf4j
 public class PostgresCommand extends AbstractCommand {
 

@@ -23,7 +23,7 @@ import com.mongodb.client.model.WriteModel;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Service("mongodbCommander")
+@Service("mongodbCommand")
 @Slf4j
 public class MongodbCommand extends AbstractCommand {
 

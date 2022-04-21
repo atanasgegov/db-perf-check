@@ -24,7 +24,7 @@ import io.confluent.ksql.api.client.KsqlObject;
 import io.confluent.ksql.api.client.Row;
 import lombok.extern.slf4j.Slf4j;
 
-@Service("ksqldbCommander")
+@Service("ksqldbCommand")
 @Slf4j
 public class KsqldbCommand extends AbstractCommand {
 

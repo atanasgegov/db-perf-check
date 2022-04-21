@@ -18,7 +18,7 @@ import com.datastax.oss.driver.api.core.cql.Row;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Service("cassandraCommander")
+@Service("cassandraCommand")
 @Slf4j
 public class CassandraCommand extends AbstractCommand {
 

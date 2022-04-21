@@ -10,21 +10,28 @@ import io.confluent.ksql.api.client.Client;
 import io.confluent.ksql.api.client.ClientOptions;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration("ksqldbConfig")
 @ConfigurationProperties(prefix = "ksqldb")
 @Getter
 @Setter
-public class KsqldbConfig extends AbstractConfig  {
+@Slf4j
+public class KsqldbConfig extends AbstractConfig {
 	
-	protected Query cleanQuery;
+	private Query cleanQuery;
 	
 	@Bean
 	public Client getKsqlDBClient() {
-		ClientOptions options = ClientOptions.create()
-				  .setHost(host)
-				  .setPort(port);
-
-		return Client.create(options);		
+		try {
+			ClientOptions options = ClientOptions.create()
+					  .setHost(host)
+					  .setPort(port);
+	
+			return Client.create(options);
+		} catch( Exception e ) {
+			log.error(e.getMessage());
+			return null;
+		}
 	}
 }

@@ -21,7 +21,7 @@ import com.akg.dbperfcheck.util.QueryUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Service("elasticsearchCommander")
+@Service("elasticsearchCommand")
 @Slf4j
 public class ElasticsearchCommand extends AbstractCommand {
 
