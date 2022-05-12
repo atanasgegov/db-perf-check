@@ -180,7 +180,7 @@ elasticsearch:
                                             ]
                                    }
                          }
-              }' # this is an additional query used to help the process for the actual query in the current '' property
+              }' # this is an additional query or property used to help the process ( in current case it is additional query for execution )
       } # in this example the result from 'additional-exec' is pass to the actual update query in 'exec'
     - {
         name: updatePricesByCountry,

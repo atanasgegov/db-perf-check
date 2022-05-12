@@ -16,6 +16,8 @@ public class Query implements Comparable<Query> {
 	private Integer percentage;
 	private QueryParams[] params;
 	private String additionalExec;
+	private Integer offset;
+	private Integer limit;
 
 	public Query(String name) {
 		this.name = name;
